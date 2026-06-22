@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Brain, Moon, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useLanguage } from "@/components/language-provider"
@@ -58,15 +59,20 @@ export function SiteHeader() {
           >
             <Moon className="size-5" />
           </button>
-          <Button
+          <Link href="/login">
+          <Button         
             variant="outline"
             className="rounded-lg border-border bg-transparent text-foreground hover:bg-secondary"
           >
             {t.nav.login}
-          </Button>
-          <Button className="rounded-lg bg-brand-blue text-primary-foreground hover:bg-brand-blue/90">
-            {t.nav.signUp}
-          </Button>
+          </Button>             
+        </Link>
+         
+          <Link href="/register">
+            <Button className="rounded-lg bg-brand-blue text-primary-foreground hover:bg-brand-blue/90">
+              {t.nav.signUp}
+            </Button>
+          </Link>
         </div>
 
         {/* Mobile actions */}
@@ -92,6 +98,7 @@ export function SiteHeader() {
                 href={link.href}
                 onClick={() => setOpen(false)}
                 className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
+                
               >
                 {link.label}
               </a>
@@ -101,10 +108,14 @@ export function SiteHeader() {
             <Button
               variant="outline"
               className="w-full rounded-lg border-border bg-transparent text-foreground hover:bg-secondary"
+              onClick={() => window.location.href = "/login"}
             >
               {t.nav.login}
             </Button>
-            <Button className="w-full rounded-lg bg-brand-blue text-primary-foreground hover:bg-brand-blue/90">
+            <Button
+              className="w-full rounded-lg bg-brand-blue text-primary-foreground hover:bg-brand-blue/90"
+              onClick={() => (window.location.href = "/register")}
+            >
               {t.nav.signUp}
             </Button>
           </div>

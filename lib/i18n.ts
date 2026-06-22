@@ -5,580 +5,103 @@ export const DEFAULT_LANG: Lang = "th"
 
 type Dict = {
   nav: {
-    home: string
-    features: string
-    howItWorks: string
-    examPrep: string
-    contact: string
-    login: string
-    signUp: string
-    resources: string
-    toggleTheme: string
-    toggleMenu: string
-    language: string
+    home: string; features: string; howItWorks: string; examPrep: string; contact: string; login: string; signUp: string; resources: string; toggleTheme: string; toggleMenu: string; language: string
   }
   hero: {
-    badge: string
-    titlePre: string
-    titleAccent: string
-    subtitle: string
-    description: string
-    startLearning: string
-    viewStatistics: string
-    socialProof: string
+    badge: string; titlePre: string; titleAccent: string; subtitle: string; description: string; startLearning: string; viewStatistics: string; socialProof: string
   }
   dashboard: {
-    sidebar: {
-      dashboard: string
-      practice: string
-      studyPlan: string
-      analysis: string
-      exams: string
-      solutions: string
-      progress: string
-      settings: string
-    }
-    welcome: string
-    overview: string
-    thisWeek: string
-    profileAlt: string
-    stats: {
-      practiceQuestions: string
-      studyTime: string
-      accuracy: string
-      streak: string
-      streakValue: string
-      fromLastWeek: (n: string) => string
-      keepItUp: string
-    }
-    studyTimeShort: string
-    learningProgress: string
-    subjectMastery: string
-    overall: string
-    upcomingGoals: string
-    goalTitle: string
-    dueIn: string
-    aiRecommendation: string
-    aiRecText: string
-    aiRecSub: string
+    sidebar: { dashboard: string; practice: string; studyPlan: string; analysis: string; exams: string; solutions: string; progress: string; settings: string }
+    welcome: string; overview: string; thisWeek: string; profileAlt: string
+    stats: { practiceQuestions: string; studyTime: string; accuracy: string; streak: string; streakValue: string; fromLastWeek: (n: string) => string; keepItUp: string }
+    studyTimeShort: string; learningProgress: string; subjectMastery: string; overall: string; upcomingGoals: string; goalTitle: string; dueIn: string; aiRecommendation: string; aiRecText: string; aiRecSub: string
   }
-  features: {
-    heading: string
-    subheading: string
-    items: { title: string; description: string }[]
-  }
-  aiLearning: {
-    tag: string
-    heading: string
-    description: string
-    items: { title: string; description: string }[]
-  }
-  skills: {
-    tag: string
-    heading: string
-    description: string
-    masteryLabel: string
-    items: { name: string; description: string }[]
-  }
-  exam: {
-    tag: string
-    heading: string
-    description: string
-    items: { title: string; description: string; tag: string }[]
-  }
-  assistant: {
-    tag: string
-    heading: string
-    description: string
-    items: { title: string; description: string }[]
-  }
-  statsDashboard: {
-    tag: string
-    heading: string
-    description: string
-    accuracyRate: string
-    studyTime: string
-    learningProgress: string
-    weakestTopics: string
-    strongestTopics: string
-    thisMonth: string
-    accuracyValue: string
-    studyTimeValue: string
-    progressValue: string
-  }
-  contact: {
-    tag: string
-    heading: string
-    description: string
-    name: string
-    namePlaceholder: string
-    email: string
-    emailPlaceholder: string
-    message: string
-    messagePlaceholder: string
-    send: string
-    emailUs: string
-    callUs: string
-    visitUs: string
-    address: string
-  }
-  footer: {
-    tagline: string
-    product: string
-    company: string
-    legal: string
-    rights: string
-    links: {
-      product: string[]
-      company: string[]
-      legal: string[]
-    }
+  features: { heading: string; subheading: string; items: { title: string; description: string }[] }
+  aiLearning: { tag: string; heading: string; description: string; items: { title: string; description: string }[] }
+  skills: { tag: string; heading: string; description: string; masteryLabel: string; items: { name: string; description: string }[] }
+  exam: { tag: string; heading: string; description: string; items: { title: string; description: string; tag: string }[] }
+  assistant: { tag: string; heading: string; description: string; items: { title: string; description: string }[] }
+  statsDashboard: { tag: string; heading: string; description: string; accuracyRate: string; studyTime: string; learningProgress: string; weakestTopics: string; strongestTopics: string; thisMonth: string; accuracyValue: string; studyTimeValue: string; progressValue: string }
+  contact: { tag: string; heading: string; description: string; name: string; namePlaceholder: string; email: string; emailPlaceholder: string; message: string; messagePlaceholder: string; send: string; emailUs: string; callUs: string; visitUs: string; address: string }
+  footer: { tagline: string; product: string; company: string; legal: string; rights: string; links: { product: string[]; company: string[]; legal: string[] } }
+  app: {
+    common: { appName: string; email: string; password: string; fullName: string; grade: string; gradeLevel: string; learningGoal: string; subjects: string; mastery: string; progress: string; accuracy: string; studyTime: string; questionsDone: string; streak: string; days: string; minutesSuffix: string; selected: string; student: string; guestMode: string; logout: string; back: string; cancel: string; continue: string; saveChanges: string; correct: string; yourAnswer: string; explanation: string; done: string; active: string; justNow: string; questions: string; completed: string; of: string; overall: string; localStorage: string; comingSoon: string; subjectsMap: Record<string, string>; gradeLabels: Record<string, string>; learningGoalsMap: Record<string, string> }
+    errors: { invalidEmail: string; passwordsDoNotMatch: string; fullNameRequired: string; passwordTooShort: string; emailExists: string; incorrectLogin: string; completeProfile: string; selectSubject: string; saveProfileFailed: string; selectGrade: string; selectLearningGoal: string }
+    shell: { toggleMenu: string; closeMenu: string; nav: { dashboard: string; practice: string; progress: string; profile: string; settings: string } }
+    login: { subtitle: string; emailPlaceholder: string; passwordPlaceholder: string; signingIn: string; submit: string; continueAsGuest: string; createAccount: string }
+    register: { subtitle: string; fullNamePlaceholder: string; emailPlaceholder: string; passwordPlaceholder: string; confirmPassword: string; confirmPasswordPlaceholder: string; creatingAccount: string; submit: string; signIn: string }
+    guestSetup: { eyebrow: string; selectGradeTitle: string; selectGoalTitle: string; description: string; startAsGuest: string }
+    onboarding: { stepLabel: (step: number, total: number) => string; gradeQuestion: string; subjectsQuestion: string; goalQuestion: string; helpPersonalize: string; back: string; completeSetup: string }
+    dashboardPage: { eyebrow: string; welcome: (name: string) => string; performanceLast7Days: string; gettingStarted: string; learningProgress: string; overallProgress: string; subjectMastery: string; quickOverview: string; learningProfile: string; focusSubjects: string; startPractice: string; recentActivities: string; latestPracticeSessions: string; viewProgress: string; noActivities: string; goToPractice: string; gradeLabel: string; streakLabel: string; accuracyLabel: string; studyTimeLabel: string; questionsDoneLabel: string; activeLabel: string }
+    practicePage: { eyebrow: string; title: string; description: (grade: string) => string; startQuiz: string; tipsTitle: string; studyDaily: string; studyDailyDescription: string; focusWeakAreas: string; focusWeakAreasDescription: (goal: string) => string; aiAdapts: string; aiAdaptsDescription: string; backToDashboard: string }
+    studyPlanPage: { eyebrow: string; title: string; description: string; myStudyPlan: string; weeklySchedule: string; dailyGoal: string; minutesLabel: string; sessionsLabel: string; subjectsLabel: string; viewAllSubjects: string; noPlan: string; noPlanDescription: string; goToPractice: string; monday: string; tuesday: string; wednesday: string; thursday: string; friday: string; saturday: string; sunday: string }
+    aiTutorPage: { eyebrow: string; title: string; description: string; selectGrade: string; selectTopic: string; selectMode: string; modes: { explain: string; create: string; solve: string; test: string }; inputPlaceholder: string; send: string; thinking: string; noTopic: string; noGrade: string }
+    progressPage: { eyebrow: string; title: string; description: (subjects: string) => string; weeklyProgress: string; subjectBreakdown: string; learningProfile: string; questionsDoneLabel: string; studyTimeLabel: string; accuracyLabel: string; streakLabel: string; overallProgressLabel: string; gradeLabel: string; goalLabel: string; selectedCount: (count: number) => string }
+    profilePage: { eyebrow: string; title: string; description: string; editProfile: string; updated: string; accountInformation: string; learningPreferences: string }
+    settingsPage: { eyebrow: string; title: string; description: string; account: string; preferences: string; session: string; notifications: string; notificationsDescription: string; privacy: string; privacyDescription: string; clearData: string; clearDataDescription: string; logoutDescription: string }
+    quiz: { completeEyebrow: string; resultsTitle: (subject: string) => string; resultsDescription: (subject: string) => string; score: string; accuracyLabel: string; time: string; status: string; reviewTitle: string; retake: string; backToPractice: string; questionCount: (current: number, total: number) => string; progressLabel: string; previous: string; submit: string; next: string; showHint: string; hintTitle: string; hintStep: (current: number, total: number) => string; hideHint: string }
   }
 }
 
 export const translations: Record<Lang, Dict> = {
   th: {
-    nav: {
-      home: "หน้าแรก",
-      features: "ฟีเจอร์",
-      howItWorks: "วิธีการทำงาน",
-      examPrep: "เตรียมสอบ",
-      contact: "ติดต่อเรา",
-      login: "เข้าสู่ระบบ",
-      signUp: "สมัครสมาชิก",
-      resources: "แหล่งเรียนรู้",
-      toggleTheme: "สลับโหมดมืด",
-      toggleMenu: "เปิดเมนู",
-      language: "ภาษา",
-    },
-    hero: {
-      badge: "การเรียนคณิตศาสตร์ด้วย AI",
-      titlePre: "Math Mentor ",
-      titleAccent: "AI",
-      subtitle: "เรียนคณิตศาสตร์เฉพาะบุคคล ขับเคลื่อนด้วย AI",
-      description:
-        "สัมผัสอนาคตของการเรียนรู้ด้วยโจทย์ที่สร้างโดย AI เส้นทางการเรียนเฉพาะบุคคล และข้อมูลเชิงลึกอัจฉริยะที่ช่วยให้คุณเชี่ยวชาญคณิตศาสตร์อย่างมั่นใจ",
-      startLearning: "เริ่มเรียนเลย",
-      viewStatistics: "ดูสถิติ",
-      socialProof: "นักเรียนกว่า 2,500+ คนกำลังเรียนอย่างชาญฉลาด",
-    },
-    dashboard: {
-      sidebar: {
-        dashboard: "แดชบอร์ด",
-        practice: "ฝึกทำโจทย์",
-        studyPlan: "แผนการเรียน",
-        analysis: "วิเคราะห์",
-        exams: "ข้อสอบ",
-        solutions: "เฉลย",
-        progress: "ความก้าวหน้า",
-        settings: "ตั้งค่า",
-      },
-      welcome: "ยินดีต้อนรับกลับมา, อเล็กซ์!",
-      overview: "นี่คือภาพรวมการเรียนของคุณ",
-      thisWeek: "สัปดาห์นี้",
-      profileAlt: "โปรไฟล์ของอเล็กซ์",
-      stats: {
-        practiceQuestions: "โจทย์ที่ฝึกทำ",
-        studyTime: "เวลาเรียน",
-        accuracy: "ความแม่นยำ",
-        streak: "ต่อเนื่อง",
-        streakValue: "7 วัน",
-        fromLastWeek: (n) => `${n} จากสัปดาห์ก่อน`,
-        keepItUp: "ทำต่อไปนะ!",
-      },
-      studyTimeShort: "8 ชม. 42 น.",
-      learningProgress: "ความก้าวหน้าการเรียน",
-      subjectMastery: "ความเชี่ยวชาญรายวิชา",
-      overall: "โดยรวม",
-      upcomingGoals: "เป้าหมายที่จะถึง",
-      goalTitle: "ทำชุดฝึกแคลคูลัสให้เสร็จ",
-      dueIn: "ครบกำหนดใน 2 วัน",
-      aiRecommendation: "คำแนะนำจาก AI",
-      aiRecText: "เน้นเรื่องเอกลักษณ์ตรีโกณมิติ",
-      aiRecSub: "อ้างอิงจากผลการเรียนล่าสุดของคุณ",
-    },
-    features: {
-      heading: "ทุกสิ่งที่คุณต้องการเพื่อเก่งคณิต",
-      subheading:
-        "เครื่องมือครบครันที่ออกแบบมาเพื่อช่วยให้นักเรียนไทยพิชิตคณิตศาสตร์ระดับมัธยมปลายและการสอบเข้ามหาวิทยาลัย",
-      items: [
-        {
-          title: "โจทย์ฝึกที่สร้างด้วย AI",
-          description: "โจทย์ไม่จำกัดที่ปรับให้เหมาะกับระดับและเป้าหมายการเรียนของคุณ",
-        },
-        {
-          title: "เส้นทางการเรียนเฉพาะบุคคล",
-          description: "AI สร้างแผนการเรียนที่ปรับตามความก้าวหน้าและจังหวะของคุณ",
-        },
-        {
-          title: "วิเคราะห์จุดแข็งจุดอ่อน",
-          description: "ข้อมูลเชิงลึกเกี่ยวกับผลการเรียนเพื่อช่วยให้คุณโฟกัสในสิ่งที่สำคัญ",
-        },
-        {
-          title: "เตรียมสอบ (A-Level, NETSAT)",
-          description: "การเตรียมสอบเฉพาะทางสำหรับคณิตศาสตร์ A-Level และ NETSAT",
-        },
-        {
-          title: "เฉลยทีละขั้นตอน",
-          description: "เฉลยที่ละเอียดและเข้าใจง่ายสำหรับทุกโจทย์ที่คุณทำ",
-        },
-        {
-          title: "แดชบอร์ดสถิติการเรียน",
-          description: "ติดตามความก้าวหน้าด้วยกราฟสวยงามและการวิเคราะห์ที่มีความหมาย",
-        },
-      ],
-    },
-    aiLearning: {
-      tag: "AI เรียนรู้เฉพาะบุคคล",
-      heading: "การเรียนที่ปรับให้เหมาะกับคุณ ด้วย AI",
-      description:
-        "ระบบ AI ของเราวิเคราะห์รูปแบบการเรียนรู้ของคุณ แล้วสร้างประสบการณ์การเรียนที่ออกแบบมาเพื่อคุณโดยเฉพาะ",
-      items: [
-        {
-          title: "วิเคราะห์จุดแข็งและจุดอ่อน",
-          description: "AI ประเมินผลการทำโจทย์ของคุณอย่างละเอียดเพื่อระบุว่าควรพัฒนาตรงไหน",
-        },
-        {
-          title: "สร้างแบบฝึกหัดคณิตเฉพาะบุคคล",
-          description: "สร้างโจทย์คณิตศาสตร์ที่ตรงกับระดับและหัวข้อที่คุณต้องฝึกมากที่สุด",
-        },
-        {
-          title: "ระบบปรับระดับความยากอัตโนมัติ",
-          description: "ความยากของโจทย์จะปรับขึ้นลงตามผลการทำของคุณแบบเรียลไทม์",
-        },
-      ],
-    },
-    skills: {
-      tag: "วิเคราะห์ทักษะคณิตศาสตร์",
-      heading: "ครอบคลุมทุกหัวข้อคณิตศาสตร์",
-      description:
-        "ติดตามและพัฒนาความเชี่ยวชาญในทุกสาขาของคณิตศาสตร์ที่จำเป็นต่อการสอบและการแข่งขัน",
-      masteryLabel: "ความเชี่ยวชาญ",
-      items: [
-        { name: "พีชคณิต", description: "สมการ ฟังก์ชัน และนิพจน์พีชคณิต" },
-        { name: "เรขาคณิต", description: "รูปทรง พื้นที่ ปริมาตร และการพิสูจน์" },
-        { name: "ตรีโกณมิติ", description: "ฟังก์ชันตรีโกณ เอกลักษณ์ และกราฟ" },
-        { name: "สถิติ", description: "การวิเคราะห์ข้อมูล การกระจาย และการสุ่ม" },
-        { name: "ความน่าจะเป็น", description: "เหตุการณ์ การจัดหมู่ และการเรียงสับเปลี่ยน" },
-        { name: "แคลคูลัส", description: "ลิมิต อนุพันธ์ และการอินทิเกรต" },
-      ],
-    },
-    exam: {
-      tag: "เตรียมสอบ",
-      heading: "พร้อมพิชิตทุกสนามสอบ",
-      description:
-        "หลักสูตรเตรียมสอบเฉพาะทางที่ออกแบบตามโครงสร้างข้อสอบจริง พร้อมข้อสอบเก่าและแนวข้อสอบล่าสุด",
-      items: [
-        {
-          title: "คณิตศาสตร์ A-Level",
-          description: "ครอบคลุมเนื้อหาตามหลักสูตรพร้อมแนวข้อสอบและการจับเวลาเสมือนจริง",
-          tag: "ยอดนิยม",
-        },
-        {
-          title: "คณิตศาสตร์ NETSAT",
-          description: "ฝึกทำโจทย์ตามรูปแบบ NETSAT พร้อมเทคนิคการทำข้อสอบให้ทันเวลา",
-          tag: "ใหม่",
-        },
-        {
-          title: "การแข่งขันคณิตศาสตร์",
-          description: "โจทย์ท้าทายระดับสูงเพื่อเตรียมตัวสำหรับการแข่งขันระดับชาติ",
-          tag: "",
-        },
-        {
-          title: "เตรียมสอบโอลิมปิก",
-          description: "โจทย์ระดับโอลิมปิกพร้อมเทคนิคการพิสูจน์และการแก้ปัญหาเชิงลึก",
-          tag: "",
-        },
-      ],
-    },
-    assistant: {
-      tag: "ผู้ช่วยเรียนรู้ AI",
-      heading: "มีติวเตอร์ AI อยู่ข้างคุณตลอดเวลา",
-      description:
-        "ผู้ช่วย AI ที่พร้อมช่วยเหลือทุกขั้นตอน ตั้งแต่การให้คำใบ้ไปจนถึงการวิเคราะห์ข้อผิดพลาด",
-      items: [
-        {
-          title: "เฉลยทีละขั้นตอน",
-          description: "อธิบายวิธีแก้โจทย์อย่างละเอียดทีละขั้น เข้าใจง่ายและเป็นระบบ",
-        },
-        {
-          title: "ระบบให้คำใบ้",
-          description: "รับคำใบ้ทีละนิดเมื่อติดขัด โดยไม่เฉลยคำตอบทั้งหมดทันที",
-        },
-        {
-          title: "วิเคราะห์ข้อผิดพลาด",
-          description: "AI ชี้จุดที่คุณเข้าใจผิดและอธิบายแนวคิดที่ถูกต้อง",
-        },
-        {
-          title: "คำแนะนำการเรียน",
-          description: "แนะนำหัวข้อและแบบฝึกหัดที่ควรทบทวนต่อไปเพื่อพัฒนาอย่างต่อเนื่อง",
-        },
-      ],
-    },
-    statsDashboard: {
-      tag: "แดชบอร์ดสถิติ",
-      heading: "เห็นความก้าวหน้าของคุณอย่างชัดเจน",
-      description:
-        "ติดตามทุกตัวชี้วัดสำคัญในที่เดียว เพื่อให้คุณรู้ว่าควรพัฒนาตรงไหนและภูมิใจกับสิ่งที่ทำได้",
-      accuracyRate: "อัตราความแม่นยำ",
-      studyTime: "เวลาเรียนสะสม",
-      learningProgress: "ความก้าวหน้าการเรียน",
-      weakestTopics: "หัวข้อที่ต้องพัฒนา",
-      strongestTopics: "หัวข้อที่ทำได้ดี",
-      thisMonth: "เดือนนี้",
-      accuracyValue: "92%",
-      studyTimeValue: "8 ชม. 42 น.",
-      progressValue: "75%",
-    },
-    contact: {
-      tag: "ติดต่อเรา",
-      heading: "มีคำถาม? เราพร้อมช่วยเหลือ",
-      description: "ติดต่อทีมงานของเราเพื่อสอบถามข้อมูลเพิ่มเติม หรือเริ่มต้นการเรียนรู้กับ Math Mentor AI",
-      name: "ชื่อ",
-      namePlaceholder: "กรอกชื่อของคุณ",
-      email: "อีเมล",
-      emailPlaceholder: "you@example.com",
-      message: "ข้อความ",
-      messagePlaceholder: "เราจะช่วยอะไรคุณได้บ้าง?",
-      send: "ส่งข้อความ",
-      emailUs: "อีเมล",
-      callUs: "โทรหาเรา",
-      visitUs: "ที่อยู่",
-      address: "กรุงเทพมหานคร ประเทศไทย",
-    },
-    footer: {
-      tagline: "เรียนคณิตศาสตร์เฉพาะบุคคล ขับเคลื่อนด้วย AI สำหรับนักเรียนไทย",
-      product: "ผลิตภัณฑ์",
-      company: "บริษัท",
-      legal: "กฎหมาย",
-      rights: "สงวนลิขสิทธิ์",
-      links: {
-        product: ["ฟีเจอร์", "เตรียมสอบ", "ราคา", "แดชบอร์ด"],
-        company: ["เกี่ยวกับเรา", "บล็อก", "ร่วมงานกับเรา", "ติดต่อ"],
-        legal: ["ความเป็นส่วนตัว", "เงื่อนไขการใช้งาน", "นโยบายคุกกี้"],
-      },
+    nav: { home: "หน้าแรก", features: "ฟีเจอร์", howItWorks: "วิธีการทำงาน", examPrep: "เตรียมสอบ", contact: "ติดต่อเรา", login: "เข้าสู่ระบบ", signUp: "สมัครสมาชิก", resources: "แหล่งเรียนรู้", toggleTheme: "สลับโหมดมืด", toggleMenu: "เปิดเมนู", language: "ภาษา" },
+    hero: { badge: "การเรียนคณิตศาสตร์ด้วย AI", titlePre: "Math Mentor ", titleAccent: "AI", subtitle: "เรียนคณิตศาสตร์เฉพาะบุคคล ขับเคลื่อนด้วย AI", description: "สัมผัสอนาคตของการเรียนรู้ด้วยโจทย์ที่สร้างโดย AI เส้นทางการเรียนเฉพาะบุคคล และข้อมูลเชิงลึกอัจฉริยะที่ช่วยให้คุณเชี่ยวชาญคณิตศาสตร์อย่างมั่นใจ", startLearning: "เริ่มเรียนเลย", viewStatistics: "ดูสถิติ", socialProof: "นักเรียนกว่า 2,500+ คนกำลังเรียนอย่างชาญฉลาด" },
+    dashboard: { sidebar: { dashboard: "แดชบอร์ด", practice: "ฝึกทำโจทย์", studyPlan: "แผนการเรียน", analysis: "วิเคราะห์", exams: "ข้อสอบ", solutions: "เฉลย", progress: "ความก้าวหน้า", settings: "ตั้งค่า" }, welcome: "ยินดีต้อนรับกลับมา, อเล็กซ์!", overview: "นี่คือภาพรวมการเรียนของคุณ", thisWeek: "สัปดาห์นี้", profileAlt: "โปรไฟล์ของอเล็กซ์", stats: { practiceQuestions: "โจทย์ที่ฝึกทำ", studyTime: "เวลาเรียน", accuracy: "ความแม่นยำ", streak: "ต่อเนื่อง", streakValue: "7 วัน", fromLastWeek: (n: string) => `${n} จากสัปดาห์ก่อน`, keepItUp: "ทำต่อไปนะ!" }, studyTimeShort: "8 ชม. 42 น.", learningProgress: "ความก้าวหน้าการเรียน", subjectMastery: "ความเชี่ยวชาญรายวิชา", overall: "โดยรวม", upcomingGoals: "เป้าหมายที่จะถึง", goalTitle: "ทำชุดฝึกแคลคูลัสให้เสร็จ", dueIn: "ครบกำหนดใน 2 วัน", aiRecommendation: "คำแนะนำจาก AI", aiRecText: "เน้นเรื่องเอกลักษณ์ตรีโกณมิติ", aiRecSub: "อ้างอิงจากผลการเรียนล่าสุดของคุณ" },
+    features: { heading: "ทุกสิ่งที่คุณต้องการเพื่อเก่งคณิต", subheading: "เครื่องมือครบครันที่ออกแบบมาเพื่อช่วยให้นักเรียนไทยพิชิตคณิตศาสตร์ระดับมัธยมปลายและการสอบเข้ามหาวิทยาลัย", items: [{ title: "โจทย์ฝึกที่สร้างด้วย AI", description: "โจทย์ไม่จำกัดที่ปรับให้เหมาะกับระดับและเป้าหมายการเรียนของคุณ" }, { title: "เส้นทางการเรียนเฉพาะบุคคล", description: "AI สร้างแผนการเรียนที่ปรับตามความก้าวหน้าและจังหวะของคุณ" }, { title: "วิเคราะห์จุดแข็งจุดอ่อน", description: "ข้อมูลเชิงลึกเกี่ยวกับผลการเรียนเพื่อช่วยให้คุณโฟกัสในสิ่งที่สำคัญ" }, { title: "เตรียมสอบ (A-Level, NETSAT)", description: "การเตรียมสอบเฉพาะทางสำหรับคณิตศาสตร์ A-Level และ NETSAT" }, { title: "เฉลยทีละขั้นตอน", description: "เฉลยที่ละเอียดและเข้าใจง่ายสำหรับทุกโจทย์ที่คุณทำ" }, { title: "แดชบอร์ดสถิติการเรียน", description: "ติดตามความก้าวหน้าด้วยกราฟสวยงามและการวิเคราะห์ที่มีความหมาย" }] },
+    aiLearning: { tag: "AI เรียนรู้เฉพาะบุคคล", heading: "การเรียนที่ปรับให้เหมาะกับคุณ ด้วย AI", description: "ระบบ AI ของเราวิเคราะห์รูปแบบการเรียนรู้ของคุณ แล้วสร้างประสบการณ์การเรียนที่ออกแบบมาเพื่อคุณโดยเฉพาะ", items: [{ title: "วิเคราะห์จุดแข็งและจุดอ่อน", description: "AI ประเมินผลการทำโจทย์ของคุณอย่างละเอียดเพื่อระบุว่าควรพัฒนาตรงไหน" }, { title: "สร้างแบบฝึกหัดคณิตเฉพาะบุคคล", description: "สร้างโจทย์คณิตศาสตร์ที่ตรงกับระดับและหัวข้อที่คุณต้องฝึกมากที่สุด" }, { title: "ระบบปรับระดับความยากอัตโนมัติ", description: "ความยากของโจทย์จะปรับขึ้นลงตามผลการทำของคุณแบบเรียลไทม์" }] },
+    skills: { tag: "วิเคราะห์ทักษะคณิตศาสตร์", heading: "ครอบคลุมทุกหัวข้อคณิตศาสตร์", description: "ติดตามและพัฒนาความเชี่ยวชาญในทุกสาขาของคณิตศาสตร์ที่จำเป็นต่อการสอบและการแข่งขัน", masteryLabel: "ความเชี่ยวชาญ", items: [{ name: "พีชคณิต", description: "สมการ ฟังก์ชัน และนิพจน์พีชคณิต" }, { name: "เรขาคณิต", description: "รูปทรง พื้นที่ ปริมาตร และการพิสูจน์" }, { name: "ตรีโกณมิติ", description: "ฟังก์ชันตรีโกณ เอกลักษณ์ และกราฟ" }, { name: "สถิติ", description: "การวิเคราะห์ข้อมูล การกระจาย และการสุ่ม" }, { name: "ความน่าจะเป็น", description: "เหตุการณ์ การจัดหมู่ และการเรียงสับเปลี่ยน" }, { name: "แคลคูลัส", description: "ลิมิต อนุพันธ์ และการอินทิเกรต" }] },
+    exam: { tag: "เตรียมสอบ", heading: "พร้อมพิชิตทุกสนามสอบ", description: "หลักสูตรเตรียมสอบเฉพาะทางที่ออกแบบตามโครงสร้างข้อสอบจริง พร้อมข้อสอบเก่าและแนวข้อสอบล่าสุด", items: [{ title: "คณิตศาสตร์ A-Level", description: "ครอบคลุมเนื้อหาตามหลักสูตรพร้อมแนวข้อสอบและการจับเวลาเสมือนจริง", tag: "ยอดนิยม" }, { title: "คณิตศาสตร์ NETSAT", description: "ฝึกทำโจทย์ตามรูปแบบ NETSAT พร้อมเทคนิคการทำข้อสอบให้ทันเวลา", tag: "ใหม่" }, { title: "การแข่งขันคณิตศาสตร์", description: "โจทย์ท้าทายระดับสูงเพื่อเตรียมตัวสำหรับการแข่งขันระดับชาติ", tag: "" }, { title: "เตรียมสอบโอลิมปิก", description: "โจทย์ระดับโอลิมปิกพร้อมเทคนิคการพิสูจน์และการแก้ปัญหาเชิงลึก", tag: "" }] },
+    assistant: { tag: "ผู้ช่วยเรียนรู้ AI", heading: "มีติวเตอร์ AI อยู่ข้างคุณตลอดเวลา", description: "ผู้ช่วย AI ที่พร้อมช่วยเหลือทุกขั้นตอน ตั้งแต่การให้คำใบ้ไปจนถึงการวิเคราะห์ข้อผิดพลาด", items: [{ title: "เฉลยทีละขั้นตอน", description: "อธิบายวิธีแก้โจทย์อย่างละเอียดทีละขั้น เข้าใจง่ายและเป็นระบบ" }, { title: "ระบบให้คำใบ้", description: "รับคำใบ้ทีละนิดเมื่อติดขัด โดยไม่เฉลยคำตอบทั้งหมดทันที" }, { title: "วิเคราะห์ข้อผิดพลาด", description: "AI ชี้จุดที่คุณเข้าใจผิดและอธิบายแนวคิดที่ถูกต้อง" }, { title: "คำแนะนำการเรียน", description: "แนะนำหัวข้อและแบบฝึกหัดที่ควรทบทวนต่อไปเพื่อพัฒนาอย่างต่อเนื่อง" }] },
+    statsDashboard: { tag: "แดชบอร์ดสถิติ", heading: "เห็นความก้าวหน้าของคุณอย่างชัดเจน", description: "ติดตามทุกตัวชี้วัดสำคัญในที่เดียว เพื่อให้คุณรู้ว่าควรพัฒนาตรงไหนและภูมิใจกับสิ่งที่ทำได้", accuracyRate: "อัตราความแม่นยำ", studyTime: "เวลาเรียนสะสม", learningProgress: "ความก้าวหน้าการเรียน", weakestTopics: "หัวข้อที่ต้องพัฒนา", strongestTopics: "หัวข้อที่ทำได้ดี", thisMonth: "เดือนนี้", accuracyValue: "92%", studyTimeValue: "8 ชม. 42 น.", progressValue: "75%" },
+    contact: { tag: "ติดต่อเรา", heading: "มีคำถาม? เราพร้อมช่วยเหลือ", description: "ติดต่อทีมงานของเราเพื่อสอบถามข้อมูลเพิ่มเติม หรือเริ่มต้นการเรียนรู้กับ Math Mentor AI", name: "ชื่อ", namePlaceholder: "กรอกชื่อของคุณ", email: "อีเมล", emailPlaceholder: "you@example.com", message: "ข้อความ", messagePlaceholder: "เราจะช่วยอะไรคุณได้บ้าง?", send: "ส่งข้อความ", emailUs: "อีเมล", callUs: "โทรหาเรา", visitUs: "ที่อยู่", address: "กรุงเทพมหานคร ประเทศไทย" },
+    footer: { tagline: "เรียนคณิตศาสตร์เฉพาะบุคคล ขับเคลื่อนด้วย AI สำหรับนักเรียนไทย", product: "ผลิตภัณฑ์", company: "บริษัท", legal: "กฎหมาย", rights: "สงวนลิขสิทธิ์", links: { product: ["ฟีเจอร์", "เตรียมสอบ", "ราคา", "แดชบอร์ด"], company: ["เกี่ยวกับเรา", "บล็อก", "ร่วมงานกับเรา", "ติดต่อ"], legal: ["ความเป็นส่วนตัว", "เงื่อนไขการใช้งาน", "นโยบายคุกกี้"] } },
+    app: {
+      common: { appName: "Math Mentor AI", email: "อีเมล", password: "รหัสผ่าน", fullName: "ชื่อ-นามสกุล", grade: "ระดับชั้น", gradeLevel: "ระดับชั้น", learningGoal: "เป้าหมายการเรียน", subjects: "รายวิชา", mastery: "ความเชี่ยวชาญ", progress: "ความคืบหน้า", accuracy: "ความแม่นยำ", studyTime: "เวลาเรียน", questionsDone: "โจทย์ที่ทำแล้ว", streak: "ต่อเนื่อง", days: "วัน", minutesSuffix: "น.", selected: "ที่เลือก", student: "นักเรียน", guestMode: "โหมดผู้เยี่ยมชม", logout: "ออกจากระบบ", back: "ย้อนกลับ", cancel: "ยกเลิก", continue: "ดำเนินการต่อ", saveChanges: "บันทึกการเปลี่ยนแปลง", correct: "ถูกต้อง", yourAnswer: "คำตอบของคุณ", explanation: "คำอธิบาย", done: "เสร็จสิ้น", active: "กำลังทำ", justNow: "เมื่อสักครู่", questions: "ข้อ", completed: "ทำแล้ว", of: "จาก", overall: "โดยรวม", localStorage: "จัดเก็บในเครื่อง", comingSoon: "เร็ว ๆ นี้", subjectsMap: { Algebra: "พีชคณิต", Geometry: "เรขาคณิต", Calculus: "แคลคูลัส", Trigonometry: "ตรีโกณมิติ", Statistics: "สถิติ" }, gradeLabels: { "Grade 7": "Grade 7 (ม.1)", "Grade 8": "Grade 8 (ม.2)", "Grade 9": "Grade 9 (ม.3)", "Grade 10": "Grade 10 (ม.4)", "Grade 11": "Grade 11 (ม.5)", "Grade 12": "Grade 12 (ม.6)" }, learningGoalsMap: { "Improve grades": "พัฒนาผลการเรียน", "Prepare for exams": "เตรียมสอบ", "University entrance exams": "เตรียมสอบเข้ามหาวิทยาลัย", "Master mathematics": "เก่งคณิตศาสตร์", "General Learning": "เรียนรู้ทั่วไป", "Exam Preparation": "เตรียมสอบ", "A-Level Preparation": "เตรียมสอบ A-Level" } },
+      errors: { invalidEmail: "กรุณากรอกอีเมลให้ถูกต้อง", passwordsDoNotMatch: "รหัสผ่านไม่ตรงกัน", fullNameRequired: "กรุณากรอกชื่อ-นามสกุล", passwordTooShort: "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร", emailExists: "มีบัญชีที่ใช้อีเมลนี้แล้ว", incorrectLogin: "อีเมลหรือรหัสผ่านไม่ถูกต้อง", completeProfile: "กรุณากรอกข้อมูลโปรไฟล์ให้ครบถ้วน", selectSubject: "กรุณาเลือกอย่างน้อยหนึ่งรายวิชา", saveProfileFailed: "ไม่สามารถบันทึกโปรไฟล์ได้ กรุณาลองอีกครั้ง", selectGrade: "กรุณาเลือกระดับชั้น", selectLearningGoal: "กรุณาเลือกเป้าหมายการเรียน" },
+      shell: { toggleMenu: "เปิด/ปิดเมนู", closeMenu: "ปิดเมนู", nav: { dashboard: "แดชบอร์ด", practice: "ฝึกทำโจทย์", progress: "ความก้าวหน้า", profile: "โปรไฟล์", settings: "ตั้งค่า" } },
+      login: { subtitle: "เข้าสู่ระบบเพื่อเรียนต่อ", emailPlaceholder: "กรอกอีเมลของคุณ", passwordPlaceholder: "กรอกรหัสผ่านของคุณ", signingIn: "กำลังเข้าสู่ระบบ...", submit: "เข้าสู่ระบบ", continueAsGuest: "ดำเนินการต่อแบบผู้เยี่ยมชม", createAccount: "สร้างบัญชี" },
+      register: { subtitle: "สร้างบัญชีเพื่อเริ่มเรียน", fullNamePlaceholder: "กรอกชื่อ-นามสกุลของคุณ", emailPlaceholder: "กรอกอีเมลของคุณ", passwordPlaceholder: "ตั้งรหัสผ่าน", confirmPassword: "ยืนยันรหัสผ่าน", confirmPasswordPlaceholder: "กรอกรหัสผ่านอีกครั้ง", creatingAccount: "กำลังสร้างบัญชี...", submit: "สร้างบัญชี", signIn: "เข้าสู่ระบบ" },
+      guestSetup: { eyebrow: "ตั้งค่าผู้เยี่ยมชม", selectGradeTitle: "เลือกระดับชั้น", selectGoalTitle: "เลือกเป้าหมายการเรียน", description: "เริ่มเรียนได้โดยไม่ต้องสร้างบัญชี", startAsGuest: "เริ่มเรียนแบบผู้เยี่ยมชม" },
+      onboarding: { stepLabel: (step: number, total: number) => `ขั้นที่ ${step} จาก ${total}`, gradeQuestion: "คุณกำลังศึกษาระดับชั้นใด?", subjectsQuestion: "คุณต้องการปรับปรุงวิชาใดบ้าง?", goalQuestion: "เป้าหมายการเรียนของคุณคืออะไร?", helpPersonalize: "ช่วยให้เราปรับประสบการณ์การเรียนรู้ให้เหมาะกับคุณ", back: "ย้อนกลับ", completeSetup: "เสร็จสิ้นการตั้งค่า" },
+      dashboardPage: { eyebrow: "แดชบอร์ด", welcome: (name: string) => `ยินดีต้อนรับกลับมา, ${name}!`, performanceLast7Days: "ผลการเรียนของคุณใน 7 วันที่ผ่านมา", gettingStarted: "เริ่มต้นแล้ว", learningProgress: "ความก้าวหน้าการเรียน", overallProgress: "ความก้าวหน้าโดยรวม", subjectMastery: "ความเชี่ยวชาญรายวิชา", quickOverview: "ภาพรวมด่วน", learningProfile: "โปรไฟล์การเรียน", focusSubjects: "รายวิชาที่เน้น", startPractice: "เริ่มฝึกทำโจทย์", recentActivities: "กิจกรรมล่าสุด", latestPracticeSessions: "การฝึกทำโจทย์ล่าสุดของคุณ", viewProgress: "ดูความก้าวหน้า", noActivities: "ยังไม่มีกิจกรรม เริ่มฝึกทำโจทย์ครั้งแรกได้เลย!", goToPractice: "ไปที่หน้าฝึกทำโจทย์", gradeLabel: "ระดับชั้น", streakLabel: "ต่อเนื่อง", accuracyLabel: "ความแม่นยำ", studyTimeLabel: "เวลาเรียน", questionsDoneLabel: "โจทย์ที่ทำแล้ว", activeLabel: "กำลังทำ" },
+      practicePage: { eyebrow: "ฝึกทำโจทย์", title: "เริ่มฝึกทำโจทย์", description: (grade: string) => `เลือกหัวข้อของ ${grade} เพื่อเริ่มทำโจทย์ที่เหมาะกับระดับของคุณ`, startQuiz: "เริ่มทำแบบทดสอบ", tipsTitle: "เคล็ดลับการฝึก", studyDaily: "เรียนทุกวัน", studyDailyDescription: "การเรียนสั้น ๆ ทุกวันช่วยสร้างนิสัยได้ดีกว่าการอ่านหนักครั้งเดียว", focusWeakAreas: "เน้นจุดที่ยังอ่อน", focusWeakAreasDescription: (goal: string) => `เป้าหมายของคุณ: ${goal}`, aiAdapts: "AI ปรับตามคุณ", aiAdaptsDescription: "ระดับความยากจะปรับตามผลการทำของคุณเมื่อเวลาผ่านไป", backToDashboard: "กลับไปแดชบอร์ด" },
+      studyPlanPage: { eyebrow: "แผนการเรียน", title: "แผนการเรียนส่วนตัว", description: "วางแผนการเรียนรู้ของคุณให้มีประสิทธิภาพมากขึ้น", myStudyPlan: "แผนการเรียนของฉัน", weeklySchedule: "ตารางเรียนรายสัปดาห์", dailyGoal: "เป้าหมายรายวัน", minutesLabel: "นาที", sessionsLabel: "ครั้ง", subjectsLabel: "วิชา", viewAllSubjects: "ดูทั้งหมด", noPlan: "ยังไม่มีแผนการเรียน", noPlanDescription: "เริ่มฝึกทำโจทย์เพื่อให้ AI สร้างแผนการเรียนที่เหมาะกับคุณ", goToPractice: "ไปฝึกทำโจทย์", monday: "จันทร์", tuesday: "อังคาร", wednesday: "พุธ", thursday: "พฤหัสบดี", friday: "ศุกร์", saturday: "เสาร์", sunday: "อาทิตย์" },
+      aiTutorPage: { eyebrow: "AI Tutor", title: "ผู้ช่วยสอน AI", description: "ถามคำถามคณิตศาสตร์กับ AI ผู้ช่วยส่วนตัวของคุณ", selectGrade: "เลือกระดับชั้น", selectTopic: "เลือกหัวข้อ", selectMode: "เลือกโหมดการเรียนรู้", modes: { explain: "อธิบายบทเรียน", create: "สร้างโจทย์", solve: "เฉลยโจทย์", test: "ทดสอบความเข้าใจ" }, inputPlaceholder: "พิมพ์คำถามของคุณที่นี่...", send: "ส่ง", thinking: "กำลังคิด...", noTopic: "กรุณาเลือกหัวข้อก่อนถาม", noGrade: "กรุณาเลือกระดับชั้นก่อน" },
+      progressPage: { eyebrow: "ความก้าวหน้า", title: "สถิติการเรียนของคุณ", description: (subjects: string) => `ติดตามการเติบโตของคุณใน ${subjects}`, weeklyProgress: "ความก้าวหน้ารายสัปดาห์", subjectBreakdown: "สรุปรายวิชา", learningProfile: "โปรไฟล์การเรียน", questionsDoneLabel: "โจทย์ที่ทำแล้ว", studyTimeLabel: "เวลาเรียน", accuracyLabel: "ความแม่นยำ", streakLabel: "ต่อเนื่อง", overallProgressLabel: "ความก้าวหน้าโดยรวม", gradeLabel: "ระดับชั้น", goalLabel: "เป้าหมาย", selectedCount: (count: number) => `เลือก ${count} วิชา` },
+      profilePage: { eyebrow: "โปรไฟล์", title: "โปรไฟล์ของคุณ", description: "ดูและอัปเดตข้อมูลการเรียนของคุณ", editProfile: "แก้ไขโปรไฟล์", updated: "อัปเดตโปรไฟล์เรียบร้อยแล้ว", accountInformation: "ข้อมูลบัญชี", learningPreferences: "การตั้งค่าการเรียน" },
+      settingsPage: { eyebrow: "ตั้งค่า", title: "ตั้งค่าบัญชี", description: "จัดการการตั้งค่าและเซสชันของคุณ", account: "บัญชี", preferences: "การตั้งค่า", session: "เซสชัน", notifications: "การแจ้งเตือน", notificationsDescription: "จัดการอีเมลและการเตือนเรียน", privacy: "ความเป็นส่วนตัวและความปลอดภัย", privacyDescription: "ข้อมูลของคุณถูกจัดเก็บไว้ในอุปกรณ์นี้", clearData: "ล้างข้อมูลในเครื่อง", clearDataDescription: "ลบบัญชีทั้งหมดที่บันทึกไว้ในเบราว์เซอร์นี้", logoutDescription: "คุณจะออกจากระบบและกลับไปยังหน้าแรก" },
+      quiz: { completeEyebrow: "ทำแบบทดสอบเสร็จแล้ว", resultsTitle: (subject: string) => `ผลแบบทดสอบ${subject}`, resultsDescription: (subject: string) => `นี่คือผลการทำแบบทดสอบ${subject}ของคุณ`, score: "คะแนน", accuracyLabel: "ความแม่นยำ", time: "เวลา", status: "สถานะ", reviewTitle: "ทบทวนคำถาม", retake: "ทำแบบทดสอบอีกครั้ง", backToPractice: "กลับไปหน้าฝึก", questionCount: (current: number, total: number) => `คำถามที่ ${current} จาก ${total}`, progressLabel: "ความคืบหน้า", previous: "ก่อนหน้า", submit: "ส่งแบบทดสอบ", next: "คำถามถัดไป", showHint: "ดูคำแนะนำ", hintTitle: "คำแนะนำทีละขั้นตอน", hintStep: (current: number, total: number) => `ขั้นที่ ${current} จาก ${total}`, hideHint: "ซ่อนคำแนะนำ" },
     },
   },
   en: {
-    nav: {
-      home: "Home",
-      features: "Features",
-      howItWorks: "How It Works",
-      examPrep: "Exam Preparation",
-      contact: "Contact",
-      login: "Login",
-      signUp: "Sign Up",
-      resources: "Resources",
-      toggleTheme: "Toggle dark mode",
-      toggleMenu: "Toggle menu",
-      language: "Language",
-    },
-    hero: {
-      badge: "AI-Powered Mathematics Learning",
-      titlePre: "Math Mentor ",
-      titleAccent: "AI",
-      subtitle: "Personalized Mathematics Learning Powered by AI",
-      description:
-        "Experience the future of learning with AI-generated questions, personalized study paths, and intelligent insights that help you master mathematics with confidence.",
-      startLearning: "Start Learning",
-      viewStatistics: "View Statistics",
-      socialProof: "2,500+ students are learning smarter",
-    },
-    dashboard: {
-      sidebar: {
-        dashboard: "Dashboard",
-        practice: "Practice",
-        studyPlan: "Study Plan",
-        analysis: "Analysis",
-        exams: "Exams",
-        solutions: "Solutions",
-        progress: "Progress",
-        settings: "Settings",
-      },
-      welcome: "Welcome back, Alex!",
-      overview: "Here's your learning overview",
-      thisWeek: "This Week",
-      profileAlt: "Alex's profile",
-      stats: {
-        practiceQuestions: "Practice Questions",
-        studyTime: "Study Time",
-        accuracy: "Accuracy",
-        streak: "Streak",
-        streakValue: "7 Days",
-        fromLastWeek: (n) => `${n} from last week`,
-        keepItUp: "Keep it up!",
-      },
-      studyTimeShort: "8h 42m",
-      learningProgress: "Learning Progress",
-      subjectMastery: "Subject Mastery",
-      overall: "Overall",
-      upcomingGoals: "Upcoming Goals",
-      goalTitle: "Complete Calculus Practice Set",
-      dueIn: "Due in 2 days",
-      aiRecommendation: "AI Recommendation",
-      aiRecText: "Focus on Trigonometric Identities",
-      aiRecSub: "Based on your recent performance",
-    },
-    features: {
-      heading: "Everything you need to excel at math",
-      subheading:
-        "A complete toolkit designed to help Thai students conquer high school mathematics and university entrance exams.",
-      items: [
-        {
-          title: "AI-generated Practice Questions",
-          description: "Unlimited personalized questions tailored to your learning level and goals.",
-        },
-        {
-          title: "Personalized Learning Paths",
-          description: "AI creates custom study plans that adapt to your progress and pace.",
-        },
-        {
-          title: "Strength & Weakness Analysis",
-          description: "Detailed insights into your performance to help you focus on what matters.",
-        },
-        {
-          title: "Exam Preparation (A-Level, NETSAT)",
-          description: "Specialized preparation for A-Level Mathematics and NETSAT exams.",
-        },
-        {
-          title: "Step-by-Step Solutions",
-          description: "Detailed, easy-to-understand solutions for every question you attempt.",
-        },
-        {
-          title: "Learning Statistics Dashboard",
-          description: "Track your progress with beautiful charts and meaningful analytics.",
-        },
-      ],
-    },
-    aiLearning: {
-      tag: "AI Personalized Learning",
-      heading: "Learning tailored to you, powered by AI",
-      description:
-        "Our AI analyzes how you learn and builds a study experience designed specifically around your needs.",
-      items: [
-        {
-          title: "Analyze strengths and weaknesses",
-          description: "AI evaluates your performance in detail to pinpoint exactly where to improve.",
-        },
-        {
-          title: "Generate personalized math exercises",
-          description: "Creates math problems matched to your level and the topics you need most.",
-        },
-        {
-          title: "Adaptive difficulty system",
-          description: "Problem difficulty scales up or down in real time based on your performance.",
-        },
-      ],
-    },
-    skills: {
-      tag: "Mathematics Skill Analysis",
-      heading: "Covering every mathematics topic",
-      description:
-        "Track and build mastery across every branch of mathematics essential for exams and competitions.",
-      masteryLabel: "Mastery",
-      items: [
-        { name: "Algebra", description: "Equations, functions, and algebraic expressions." },
-        { name: "Geometry", description: "Shapes, area, volume, and proofs." },
-        { name: "Trigonometry", description: "Trig functions, identities, and graphs." },
-        { name: "Statistics", description: "Data analysis, distributions, and sampling." },
-        { name: "Probability", description: "Events, combinations, and permutations." },
-        { name: "Calculus", description: "Limits, derivatives, and integration." },
-      ],
-    },
-    exam: {
-      tag: "Exam Preparation",
-      heading: "Ready to conquer every exam",
-      description:
-        "Specialized prep courses built around real exam structures, with past papers and the latest question formats.",
-      items: [
-        {
-          title: "A-Level Mathematics",
-          description: "Full curriculum coverage with practice papers and realistic timed simulations.",
-          tag: "Popular",
-        },
-        {
-          title: "NETSAT Mathematics",
-          description: "Practice in the NETSAT format with techniques to finish on time.",
-          tag: "New",
-        },
-        {
-          title: "Mathematics Competitions",
-          description: "High-level challenge problems to prepare for national competitions.",
-          tag: "",
-        },
-        {
-          title: "Olympiad Preparation",
-          description: "Olympiad-level problems with proof techniques and deep problem solving.",
-          tag: "",
-        },
-      ],
-    },
-    assistant: {
-      tag: "AI Learning Assistant",
-      heading: "An AI tutor by your side, anytime",
-      description:
-        "An AI assistant ready to help at every step, from giving hints to analyzing your mistakes.",
-      items: [
-        {
-          title: "Step-by-step solutions",
-          description: "Detailed explanations that walk through each step clearly and systematically.",
-        },
-        {
-          title: "Hint system",
-          description: "Get nudged with hints when you're stuck, without revealing the full answer.",
-        },
-        {
-          title: "Error analysis",
-          description: "AI identifies your misconceptions and explains the correct concepts.",
-        },
-        {
-          title: "Learning recommendations",
-          description: "Suggests topics and exercises to review next for continuous improvement.",
-        },
-      ],
-    },
-    statsDashboard: {
-      tag: "Statistics Dashboard",
-      heading: "See your progress with crystal clarity",
-      description:
-        "Track every key metric in one place so you know exactly where to improve and what to be proud of.",
-      accuracyRate: "Accuracy Rate",
-      studyTime: "Study Time",
-      learningProgress: "Learning Progress",
-      weakestTopics: "Weakest Topics",
-      strongestTopics: "Strongest Topics",
-      thisMonth: "This Month",
-      accuracyValue: "92%",
-      studyTimeValue: "8h 42m",
-      progressValue: "75%",
-    },
-    contact: {
-      tag: "Contact",
-      heading: "Have questions? We're here to help",
-      description: "Reach out to our team for more information or to start learning with Math Mentor AI.",
-      name: "Name",
-      namePlaceholder: "Enter your name",
-      email: "Email",
-      emailPlaceholder: "you@example.com",
-      message: "Message",
-      messagePlaceholder: "How can we help you?",
-      send: "Send Message",
-      emailUs: "Email Us",
-      callUs: "Call Us",
-      visitUs: "Visit Us",
-      address: "Bangkok, Thailand",
-    },
-    footer: {
-      tagline: "Personalized mathematics learning powered by AI, built for Thai students.",
-      product: "Product",
-      company: "Company",
-      legal: "Legal",
-      rights: "All rights reserved.",
-      links: {
-        product: ["Features", "Exam Prep", "Pricing", "Dashboard"],
-        company: ["About", "Blog", "Careers", "Contact"],
-        legal: ["Privacy", "Terms of Service", "Cookie Policy"],
-      },
+    nav: { home: "Home", features: "Features", howItWorks: "How It Works", examPrep: "Exam Preparation", contact: "Contact", login: "Login", signUp: "Sign Up", resources: "Resources", toggleTheme: "Toggle dark mode", toggleMenu: "Toggle menu", language: "Language" },
+    hero: { badge: "AI-Powered Mathematics Learning", titlePre: "Math Mentor ", titleAccent: "AI", subtitle: "Personalized Mathematics Learning Powered by AI", description: "Experience the future of learning with AI-generated questions, personalized study paths, and intelligent insights that help you master mathematics with confidence.", startLearning: "Start Learning", viewStatistics: "View Statistics", socialProof: "2,500+ students are learning smarter" },
+    dashboard: { sidebar: { dashboard: "Dashboard", practice: "Practice", studyPlan: "Study Plan", analysis: "Analysis", exams: "Exams", solutions: "Solutions", progress: "Progress", settings: "Settings" }, welcome: "Welcome back, Alex!", overview: "Here's your learning overview", thisWeek: "This Week", profileAlt: "Alex's profile", stats: { practiceQuestions: "Practice Questions", studyTime: "Study Time", accuracy: "Accuracy", streak: "Streak", streakValue: "7 Days", fromLastWeek: (n: string) => `${n} from last week`, keepItUp: "Keep it up!" }, studyTimeShort: "8h 42m", learningProgress: "Learning Progress", subjectMastery: "Subject Mastery", overall: "Overall", upcomingGoals: "Upcoming Goals", goalTitle: "Complete Calculus Practice Set", dueIn: "Due in 2 days", aiRecommendation: "AI Recommendation", aiRecText: "Focus on Trigonometric Identities", aiRecSub: "Based on your recent performance" },
+    features: { heading: "Everything you need to excel at math", subheading: "A complete toolkit designed to help Thai students conquer high school mathematics and university entrance exams.", items: [{ title: "AI-generated Practice Questions", description: "Unlimited personalized questions tailored to your learning level and goals." }, { title: "Personalized Learning Paths", description: "AI creates custom study plans that adapt to your progress and pace." }, { title: "Strength & Weakness Analysis", description: "Detailed insights into your performance to help you focus on what matters." }, { title: "Exam Preparation (A-Level, NETSAT)", description: "Specialized preparation for A-Level Mathematics and NETSAT exams." }, { title: "Step-by-Step Solutions", description: "Detailed, easy-to-understand solutions for every question you attempt." }, { title: "Learning Statistics Dashboard", description: "Track your progress with beautiful charts and meaningful analytics." }] },
+    aiLearning: { tag: "AI Personalized Learning", heading: "Learning tailored to you, powered by AI", description: "Our AI analyzes how you learn and builds a study experience designed specifically around your needs.", items: [{ title: "Analyze strengths and weaknesses", description: "AI evaluates your performance in detail to pinpoint exactly where to improve." }, { title: "Generate personalized math exercises", description: "Creates math problems matched to your level and the topics you need most." }, { title: "Adaptive difficulty system", description: "Problem difficulty scales up or down in real time based on your performance." }] },
+    skills: { tag: "Mathematics Skill Analysis", heading: "Covering every mathematics topic", description: "Track and build mastery across every branch of mathematics essential for exams and competitions.", masteryLabel: "Mastery", items: [{ name: "Algebra", description: "Equations, functions, and algebraic expressions." }, { name: "Geometry", description: "Shapes, area, volume, and proofs." }, { name: "Trigonometry", description: "Trig functions, identities, and graphs." }, { name: "Statistics", description: "Data analysis, distributions, and sampling." }, { name: "Probability", description: "Events, combinations, and permutations." }, { name: "Calculus", description: "Limits, derivatives, and integration." }] },
+    exam: { tag: "Exam Preparation", heading: "Ready to conquer every exam", description: "Specialized prep courses built around real exam structures, with past papers and the latest question formats.", items: [{ title: "A-Level Mathematics", description: "Full curriculum coverage with practice papers and realistic timed simulations.", tag: "Popular" }, { title: "NETSAT Mathematics", description: "Practice in the NETSAT format with techniques to finish on time.", tag: "New" }, { title: "Mathematics Competitions", description: "High-level challenge problems to prepare for national competitions.", tag: "" }, { title: "Olympiad Preparation", description: "Olympiad-level problems with proof techniques and deep problem solving.", tag: "" }] },
+    assistant: { tag: "AI Learning Assistant", heading: "An AI tutor by your side, anytime", description: "An AI assistant ready to help at every step, from giving hints to analyzing your mistakes.", items: [{ title: "Step-by-step solutions", description: "Detailed explanations that walk through each step clearly and systematically." }, { title: "Hint system", description: "Get nudged with hints when you're stuck, without revealing the full answer." }, { title: "Error analysis", description: "AI identifies your misconceptions and explains the correct concepts." }, { title: "Learning recommendations", description: "Suggests topics and exercises to review next for continuous improvement." }] },
+    statsDashboard: { tag: "Statistics Dashboard", heading: "See your progress with crystal clarity", description: "Track every key metric in one place so you know exactly where to improve and what to be proud of.", accuracyRate: "Accuracy Rate", studyTime: "Study Time", learningProgress: "Learning Progress", weakestTopics: "Weakest Topics", strongestTopics: "Strongest Topics", thisMonth: "This Month", accuracyValue: "92%", studyTimeValue: "8h 42m", progressValue: "75%" },
+    contact: { tag: "Contact", heading: "Have questions? We're here to help", description: "Reach out to our team for more information or to start learning with Math Mentor AI.", name: "Name", namePlaceholder: "Enter your name", email: "Email", emailPlaceholder: "you@example.com", message: "Message", messagePlaceholder: "How can we help you?", send: "Send Message", emailUs: "Email Us", callUs: "Call Us", visitUs: "Visit Us", address: "Bangkok, Thailand" },
+    footer: { tagline: "Personalized mathematics learning powered by AI, built for Thai students.", product: "Product", company: "Company", legal: "Legal", rights: "All rights reserved.", links: { product: ["Features", "Exam Prep", "Pricing", "Dashboard"], company: ["About", "Blog", "Careers", "Contact"], legal: ["Privacy", "Terms of Service", "Cookie Policy"] } },
+    app: {
+      common: { appName: "Math Mentor AI", email: "Email", password: "Password", fullName: "Full Name", grade: "Grade", gradeLevel: "Grade Level", learningGoal: "Learning Goal", subjects: "Subjects", mastery: "Mastery", progress: "Progress", accuracy: "Accuracy", studyTime: "Study Time", questionsDone: "Questions Done", streak: "Streak", days: "days", minutesSuffix: "m", selected: "selected", student: "Student", guestMode: "Guest Mode", logout: "Logout", back: "Back", cancel: "Cancel", continue: "Continue", saveChanges: "Save Changes", correct: "Correct", yourAnswer: "Your answer", explanation: "Explanation", done: "Done", active: "Active", justNow: "Just now", questions: "questions", completed: "completed", of: "of", overall: "overall", localStorage: "Local storage", comingSoon: "Coming soon", subjectsMap: { Algebra: "Algebra", Geometry: "Geometry", Calculus: "Calculus", Trigonometry: "Trigonometry", Statistics: "Statistics" }, gradeLabels: { "Grade 7": "Grade 7 (M1)", "Grade 8": "Grade 8 (M2)", "Grade 9": "Grade 9 (M3)", "Grade 10": "Grade 10 (M4)", "Grade 11": "Grade 11 (M5)", "Grade 12": "Grade 12 (M6)" }, learningGoalsMap: { "Improve grades": "Improve grades", "Prepare for exams": "Prepare for exams", "University entrance exams": "University entrance exams", "Master mathematics": "Master mathematics", "General Learning": "General Learning", "Exam Preparation": "Exam Preparation", "A-Level Preparation": "A-Level Preparation" } },
+      errors: { invalidEmail: "Please enter a valid email address.", passwordsDoNotMatch: "Passwords do not match.", fullNameRequired: "Full name is required.", passwordTooShort: "Password must be at least 6 characters.", emailExists: "An account with this email already exists.", incorrectLogin: "Incorrect email or password.", completeProfile: "Please complete all profile fields.", selectSubject: "Please select at least one subject.", saveProfileFailed: "Unable to save profile. Please try again.", selectGrade: "Please select your grade level.", selectLearningGoal: "Please select your learning goal." },
+      shell: { toggleMenu: "Toggle menu", closeMenu: "Close menu", nav: { dashboard: "Dashboard", practice: "Practice", progress: "Progress", profile: "Profile", settings: "Settings" } },
+      login: { subtitle: "Sign in to continue learning", emailPlaceholder: "Enter your email", passwordPlaceholder: "Enter your password", signingIn: "Signing in...", submit: "Login", continueAsGuest: "Continue as Guest", createAccount: "Create Account" },
+      register: { subtitle: "Create your account to start learning", fullNamePlaceholder: "Enter your full name", emailPlaceholder: "Enter your email", passwordPlaceholder: "Create a password", confirmPassword: "Confirm Password", confirmPasswordPlaceholder: "Confirm your password", creatingAccount: "Creating account...", submit: "Create Account", signIn: "Sign In" },
+      guestSetup: { eyebrow: "Guest Setup", selectGradeTitle: "Select Grade Level", selectGoalTitle: "Select Learning Goal", description: "Start learning without creating an account.", startAsGuest: "Start as Guest" },
+      onboarding: { stepLabel: (step: number, total: number) => `Step ${step} of ${total}`, gradeQuestion: "What grade are you studying?", subjectsQuestion: "What subjects do you want to improve?", goalQuestion: "What is your learning goal?", helpPersonalize: "Help us personalize your learning experience", back: "Back", completeSetup: "Complete Setup" },
+      dashboardPage: { eyebrow: "Dashboard", welcome: (name: string) => `Welcome back, ${name}!`, performanceLast7Days: "Your performance over the last 7 days", gettingStarted: "Getting started", learningProgress: "Learning Progress", overallProgress: "Overall Progress", subjectMastery: "Subject Mastery", quickOverview: "Quick Overview", learningProfile: "Your learning profile", focusSubjects: "Focus Subjects", startPractice: "Start Practice", recentActivities: "Recent Activities", latestPracticeSessions: "Your latest practice sessions", viewProgress: "View progress", noActivities: "No activities yet. Start your first practice session!", goToPractice: "Go to Practice", gradeLabel: "Grade", streakLabel: "Streak", accuracyLabel: "Accuracy", studyTimeLabel: "Study Time", questionsDoneLabel: "Questions Done", activeLabel: "Active" },
+      practicePage: { eyebrow: "Practice", title: "Start practicing", description: (grade: string) => `Choose a ${grade} topic to begin questions tailored to your level.`, startQuiz: "Start Quiz", tipsTitle: "Practice Tips", studyDaily: "Study daily", studyDailyDescription: "Short daily sessions build stronger habits than long cramming.", focusWeakAreas: "Focus on weak areas", focusWeakAreasDescription: (goal: string) => `Your goal: ${goal}.`, aiAdapts: "AI adapts to you", aiAdaptsDescription: "Difficulty adjusts based on your performance over time.", backToDashboard: "Back to Dashboard" },
+      studyPlanPage: { eyebrow: "Study Plan", title: "Your Personalized Study Plan", description: "Plan your learning for maximum efficiency", myStudyPlan: "My Study Plan", weeklySchedule: "Weekly Schedule", dailyGoal: "Daily Goal", minutesLabel: "min", sessionsLabel: "sessions", subjectsLabel: "subjects", viewAllSubjects: "View all", noPlan: "No study plan yet", noPlanDescription: "Start practicing to let AI create a study plan tailored for you", goToPractice: "Go to Practice", monday: "Mon", tuesday: "Tue", wednesday: "Wed", thursday: "Thu", friday: "Fri", saturday: "Sat", sunday: "Sun" },
+      aiTutorPage: { eyebrow: "AI Tutor", title: "AI Math Tutor", description: "Ask math questions to your personal AI assistant", selectGrade: "Select Grade", selectTopic: "Select Topic", selectMode: "Select Learning Mode", modes: { explain: "Explain Lesson", create: "Create Questions", solve: "Solve Problems", test: "Test Understanding" }, inputPlaceholder: "Type your question here...", send: "Send", thinking: "Thinking...", noTopic: "Please select a topic first", noGrade: "Please select a grade first" },
+      progressPage: { eyebrow: "Progress", title: "Your learning statistics", description: (subjects: string) => `Track your growth across ${subjects}.`, weeklyProgress: "Weekly Progress", subjectBreakdown: "Subject Breakdown", learningProfile: "Learning Profile", questionsDoneLabel: "Questions Done", studyTimeLabel: "Study Time", accuracyLabel: "Accuracy", streakLabel: "Streak", overallProgressLabel: "Overall Progress", gradeLabel: "Grade", goalLabel: "Goal", selectedCount: (count: number) => `${count} selected` },
+      profilePage: { eyebrow: "Profile", title: "Your profile", description: "View and update your learning information.", editProfile: "Edit Profile", updated: "Profile updated successfully.", accountInformation: "Account Information", learningPreferences: "Learning Preferences" },
+      settingsPage: { eyebrow: "Settings", title: "Account settings", description: "Manage your preferences and session.", account: "Account", preferences: "Preferences", session: "Session", notifications: "Notifications", notificationsDescription: "Manage email and study reminders.", privacy: "Privacy & Security", privacyDescription: "Your data is stored locally on this device.", clearData: "Clear Local Data", clearDataDescription: "Remove all saved accounts from this browser.", logoutDescription: "You will be signed out and redirected to the home page." },
+      quiz: { completeEyebrow: "Quiz Complete", resultsTitle: (subject: string) => `${subject} Quiz Results`, resultsDescription: (subject: string) => `Here's how you performed on the ${subject.toLowerCase()} quiz`, score: "Score", accuracyLabel: "Accuracy", time: "Time", status: "Status", reviewTitle: "Question Review", retake: "Retake Quiz", backToPractice: "Back to Practice", questionCount: (current: number, total: number) => `Question ${current} of ${total}`, progressLabel: "Progress", previous: "Previous", submit: "Submit Quiz", next: "Next Question", showHint: "Show Hint", hintTitle: "Step-by-Step Hint", hintStep: (current: number, total: number) => `Step ${current} of ${total}`, hideHint: "Hide Hint" },
     },
   },
 }
