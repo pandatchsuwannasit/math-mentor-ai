@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import {
   ArrowRight,
@@ -15,32 +15,47 @@ import {
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import { AuthGuard } from "@/components/auth-guard"
-import { DashboardShell } from "@/components/dashboard-shell"
 import { useAuth } from "@/hooks/use-auth"
 import { useLanguage } from "@/components/language-provider"
-import type { QuizResult, QuizSubjectConfig } from "@/lib/quiz-data"
+import { useGamification } from "@/hooks/use-gamification"
+import { calculateLevel } from "@/lib/gamification"
 import type { User } from "@/lib/types"
 import { innerCardClassName, panelClassName } from "@/lib/dashboard-utils"
-import { getQuestionsForTopic, saveTopicProgress, getTopicProgress } from "@/lib/question-bank"
+import { getQuestionsForTopic, getAdaptiveQuestions, saveTopicProgress, getTopicProgress } from "@/lib/question-bank"
+import type { QuizQuestion } from "@/lib/question-bank/types"
+import { QuizShell } from "./quiz-shell"
+import { CelebrationModal } from "@/components/celebration-modal"
 
 const USERS_KEY = "mathmentor-users"
 const QUIZ_RESULTS_KEY = "mathmentor-quiz-results"
 
-export function SubjectQuiz({ config, topicId }: { config?: QuizSubjectConfig; topicId?: string }) {
+interface QuizResult {
+  quizId: string
+  subject: string
+  score: number
+  total: number
+  percentage: number
+  completedAt: string
+  answers: number[]
+  timeSpentMinutes: number
+}
+
+export function SubjectQuiz({ topicId }: { topicId?: string }) {
   return (
     <AuthGuard>
-      <DashboardShell>
-        <QuizContent config={config} topicId={topicId} />
-      </DashboardShell>
+      <QuizShell>
+        <QuizContent topicId={topicId} />
+      </QuizShell>
     </AuthGuard>
   )
 }
 
-function QuizContent({ config, topicId }: { config?: QuizSubjectConfig; topicId?: string }) {
+function QuizContent({ topicId }: { topicId?: string }) {
   const router = useRouter()
   const { user, refresh, setUser } = useAuth()
   const { t } = useLanguage()
-  const [currentQuestion, setCurrentQuestion] = useState(0)
+  const { awardQuizXP, loseHeart, hearts } = useGamification()
+  const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0)
   const [answers, setAnswers] = useState<number[]>([])
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [showResult, setShowResult] = useState(false)
@@ -48,60 +63,49 @@ function QuizContent({ config, topicId }: { config?: QuizSubjectConfig; topicId?
   const [showHints, setShowHints] = useState(false)
   const [hintStep, setHintStep] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
+  const [questions, setQuestions] = useState<QuizQuestion[]>([])
+  const [quizHearts, setQuizHearts] = useState(5)
+  const [quizEnded, setQuizEnded] = useState(false)
+  const [showCelebration, setShowCelebration] = useState(false)
+  const [celebrationData, setCelebrationData] = useState({ xp: 0, levelUp: false, newLevel: 1, achievement: "" })
 
-  // Simulate loading state for better UX
+  // Load and randomize questions on mount using adaptive difficulty
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 300)
+    const timer = setTimeout(() => {
+      if (topicId) {
+        const progress = getTopicProgress(topicId)
+        const totalInTopic = getTotalForTopic(topicId)
+        const accuracy = progress ? Math.round((progress.totalCorrect / (progress.totalCorrect + progress.totalWrong || 1)) * 100) : 50
+        const recentIds = progress?.recentQuestionIds || []
+        const adaptiveQs = getAdaptiveQuestions(topicId, accuracy, Math.min(10, totalInTopic), recentIds)
+        setQuestions(adaptiveQs)
+        setQuizHearts(user?.stats.hearts ?? 5)
+      }
+      setIsLoading(false)
+    }, 300)
     return () => clearTimeout(timer)
-  }, [])
-
-  // Topic-based quiz mode (must be before conditional returns)
-  const topicQuestions = topicId ? getQuestionsForTopic(topicId) : []
-  const rawQuestions = config?.questions || topicQuestions
-  
-  // Normalize questions first
-  const normalizedRaw = rawQuestions.map((q) => ({
-    id: (q as any).id || crypto.randomUUID(),
-    question: (q as any).question || (q as any).content || "",
-    options: (q as any).options || (q as any).choices || [],
-    correctAnswer: (q as any).correctAnswer ?? (q as any).answer ?? 0,
-    explanation: (q as any).explanation || "",
-    hints: (q as any).hints || [],
-  }))
-  
-  // Randomize: select up to 10 questions and shuffle answer choices
-  const questions = useMemo(() => {
-    const shuffled = [...normalizedRaw].sort(() => Math.random() - 0.5).slice(0, 10)
-    return shuffled.map((q) => ({
-      ...q,
-      options: shuffleArray([...q.options]),
-    }))
-  }, [topicId, config?.questions])
+  }, [topicId, user?.stats.hearts])
 
   if (!user?.onboarding?.completed) return null
 
   const activeUser = user
 
-  // Diagnostic logging
-  console.log("topicId", topicId)
-  console.log("questions", questions.length)
+  // Safety checks
+  if (!topicId) {
+    return (
+      <div className="p-6">
+        <h2 className="text-xl font-bold text-white">ข้อผิดพลาด: ไม่พบหัวข้อ</h2>
+        <p className="mt-2 text-slate-400">กรุณาเลือกหัวข้อจากหน้าเรียน</p>
+      </div>
+    )
+  }
 
-  // Defensive validation
-  if (!questions || questions.length === 0) {
+  if (!isLoading && questions.length === 0) {
     return (
       <div className="p-6">
         <h2 className="text-xl font-bold text-white">ไม่พบคำถามสำหรับบทเรียนนี้</h2>
         <p className="mt-2 text-slate-400">กรุณาตรวจสอบ Question Bank และ Topic ID</p>
         <p className="mt-2 text-sm text-slate-500">Topic ID: {topicId}</p>
-      </div>
-    )
-  }
-
-  if (currentQuestion < 0 || currentQuestion >= questions.length) {
-    return (
-      <div className="p-6">
-        <h2 className="text-xl font-bold text-white">ข้อผิดพลาดของดัชนีคำถาม</h2>
-        <p className="mt-2 text-slate-400">กรุณาลองใหม่อีกครั้ง</p>
       </div>
     )
   }
@@ -116,12 +120,9 @@ function QuizContent({ config, topicId }: { config?: QuizSubjectConfig; topicId?
       </div>
     )
   }
-  
-  const question = questions[currentQuestion]
-  const isLastQuestion = currentQuestion === questions.length - 1
 
-  const normalizedQuestions = questions
-  const normalizedQuestion = normalizedQuestions[currentQuestion]
+  const currentQuestion = questions[currentQuestionIdx]
+  const isLastQuestion = currentQuestionIdx === questions.length - 1
 
   function handleAnswer(answerIndex: number) {
     setSelectedAnswer(answerIndex)
@@ -130,18 +131,29 @@ function QuizContent({ config, topicId }: { config?: QuizSubjectConfig; topicId?
   function handleNext() {
     if (selectedAnswer === null) return
 
+    const isCorrect = selectedAnswer === currentQuestion.answer
+    if (!isCorrect) {
+      const newHearts = quizHearts - 1
+      setQuizHearts(newHearts)
+      loseHeart()
+      if (newHearts <= 0) {
+        setQuizEnded(true)
+        return
+      }
+    }
+
     const newAnswers = [...answers, selectedAnswer]
     setAnswers(newAnswers)
     setSelectedAnswer(null)
 
-    if (isLastQuestion) {
-      const score = getScore(newAnswers, config, normalizedQuestions)
+    if (isLastQuestion || quizEnded) {
+      const score = getScore(newAnswers, questions)
       const timeSpentMinutes = Math.round((Date.now() - startTime) / 60000)
       const percentage = Math.round((score / questions.length) * 100)
 
       const result: QuizResult = {
         quizId: crypto.randomUUID(),
-        subject: (config?.subject || "Algebra") as import("@/lib/types").Subject,
+        subject: currentQuestion.curriculum,
         score,
         total: questions.length,
         percentage,
@@ -150,25 +162,40 @@ function QuizContent({ config, topicId }: { config?: QuizSubjectConfig; topicId?
         timeSpentMinutes,
       }
 
+      const wrongIds = getWrongIds(newAnswers)
+      const scoreVal = getScore(newAnswers, questions)
+      
       const updatedUser = saveQuizProgress({
         userId: activeUser.id,
-        subject: (config?.subject || "Algebra") as import("@/lib/types").Subject,
-        title: config?.title || topicId || "Quiz",
+        subject: currentQuestion.curriculum as any,
+        title: currentQuestion.topicName || topicId || "Quiz",
         questionCount: questions.length,
-        score,
+        score: scoreVal,
         percentage,
         timeSpentMinutes,
+        wrongIds,
       })
 
-      // Save topic-specific progress
       if (topicId) {
         const existingProgress = getTopicProgress(topicId)
+        const totalCorrect = (existingProgress?.totalCorrect || 0) + scoreVal
+        const totalWrong = (existingProgress?.totalWrong || 0) + (questions.length - scoreVal)
+        const existingRecent = existingProgress?.recentQuestionIds || []
+        const newRecent = [...questions.map((q) => q.id), ...existingRecent].slice(0, 30)
+        
         saveTopicProgress(topicId, {
           completed: true,
           score,
           attempts: (existingProgress?.attempts || 0) + 1,
           bestScore: Math.max(existingProgress?.bestScore || 0, percentage),
           lastAttempt: new Date().toISOString(),
+          wrongQuestionIds: existingProgress?.wrongQuestionIds
+            ? [...new Set([...existingProgress.wrongQuestionIds, ...wrongIds])]
+            : wrongIds,
+          totalCorrect,
+          totalWrong,
+          totalTimeMinutes: (existingProgress?.totalTimeMinutes || 0) + timeSpentMinutes,
+          recentQuestionIds: newRecent,
         })
       }
 
@@ -177,16 +204,39 @@ function QuizContent({ config, topicId }: { config?: QuizSubjectConfig; topicId?
         refresh()
       }
 
+      // Award XP
+      const isPerfect = scoreVal === questions.length
+      const xpEarned = scoreVal * 10 + (isPerfect ? 50 : 0)
+      const xpBefore = user?.stats.xp || 0
+      const xpAfter = xpBefore + xpEarned
+      const oldLevel = calculateLevel(xpBefore)
+      const newLevel = calculateLevel(xpAfter)
+      const levelUp = newLevel > oldLevel
+
+      awardQuizXP(scoreVal, questions.length)
+
+      setCelebrationData({
+        xp: xpEarned,
+        levelUp,
+        newLevel,
+        achievement: isPerfect ? "🌟 Perfect Score!" : "",
+      })
+      setShowCelebration(true)
+
       saveQuizResult(result)
       setShowResult(true)
       return
     }
 
-    setCurrentQuestion(currentQuestion + 1)
+    setCurrentQuestionIdx(currentQuestionIdx + 1)
+  }
+
+  function getWrongIds(answers: number[]): string[] {
+    return questions.filter((q, i) => answers[i] !== q.answer).map((q) => q.id)
   }
 
   function handleRestart() {
-    setCurrentQuestion(0)
+    setCurrentQuestionIdx(0)
     setAnswers([])
     setSelectedAnswer(null)
     setShowResult(false)
@@ -207,7 +257,7 @@ function QuizContent({ config, topicId }: { config?: QuizSubjectConfig; topicId?
   }
 
   function handleNextHint() {
-    const hints = normalizedQuestion.hints
+    const hints = currentQuestion.hints
     if (hints && hintStep < hints.length - 1) {
       setHintStep(hintStep + 1)
     }
@@ -220,21 +270,40 @@ function QuizContent({ config, topicId }: { config?: QuizSubjectConfig; topicId?
   }
 
   if (showResult) {
-    const score = getScore(answers, config, normalizedQuestions)
+    const score = getScore(answers, questions)
     const percentage = Math.round((score / questions.length) * 100)
     const timeSpentMinutes = Math.round((Date.now() - startTime) / 60000)
+    const isPerfect = score === questions.length
 
     return (
       <>
+        <CelebrationModal
+          isOpen={showCelebration}
+          onClose={() => setShowCelebration(false)}
+          title={isPerfect ? "Perfect Score!" : " Quiz Complete!"}
+          xpEarned={celebrationData.xp}
+          levelUp={celebrationData.levelUp}
+          newLevel={celebrationData.newLevel}
+          achievement={celebrationData.achievement}
+        />
+
         <div className="mb-6">
           <p className="text-sm font-medium text-cyan-400">{t.app.quiz.completeEyebrow}</p>
           <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">
-            {t.app.quiz.resultsTitle((config?.subject || "Algebra") as import("@/lib/types").Subject)}
+            {t.app.quiz.resultsTitle(currentQuestion.curriculum as any)}
           </h1>
           <p className="mt-2 text-slate-400">
-            {t.app.quiz.resultsDescription((config?.subject || "Algebra") as import("@/lib/types").Subject)}
+            {t.app.quiz.resultsDescription(currentQuestion.curriculum as any)}
           </p>
         </div>
+
+        {isPerfect && (
+          <div className="mb-6 rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-4 text-center">
+            <p className="text-2xl">🌟</p>
+            <p className="mt-1 text-sm font-semibold text-yellow-300">Perfect Score!</p>
+            <p className="text-xs text-yellow-400">+50 XP Bonus</p>
+          </div>
+        )}
 
         <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <ResultCard label={t.app.quiz.score} value={`${score}/${questions.length}`} icon={Target} color="text-cyan-400" />
@@ -246,8 +315,8 @@ function QuizContent({ config, topicId }: { config?: QuizSubjectConfig; topicId?
         <section className={panelClassName}>
           <h2 className="mb-4 text-lg font-semibold text-white">{t.app.quiz.reviewTitle}</h2>
           <div className="space-y-4">
-            {normalizedQuestions.map((item, index) => {
-              const isCorrect = answers[index] === item.correctAnswer
+            {questions.map((item, index) => {
+              const isCorrect = answers[index] === item.answer
               return (
                 <div key={item.id} className={innerCardClassName}>
                   <div className="flex items-start gap-3">
@@ -261,9 +330,9 @@ function QuizContent({ config, topicId }: { config?: QuizSubjectConfig; topicId?
                         {t.app.quiz.questionCount(index + 1, questions.length)}. {item.question}
                       </p>
                       <div className="space-y-1">
-                        {item.options.map((option: string, optionIndex: number) => {
+                        {item.choices.map((option: string, optionIndex: number) => {
                           const isSelected = answers[index] === optionIndex
-                          const isCorrectOption = optionIndex === item.correctAnswer
+                          const isCorrectOption = optionIndex === item.answer
                           return (
                             <div
                               key={option}
@@ -294,24 +363,24 @@ function QuizContent({ config, topicId }: { config?: QuizSubjectConfig; topicId?
           </div>
         </section>
 
-        <div className="mt-6 flex gap-3">
-          <button
-            type="button"
-            onClick={handleRestart}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-slate-600 p-3 text-white transition-colors hover:bg-slate-800"
-          >
-            <RotateCcw className="size-4" />
-            {t.app.quiz.retake}
-          </button>
-          <button
-            type="button"
-            onClick={handleBackToPractice}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-cyan-500 p-3 font-semibold text-white transition-colors hover:bg-cyan-400"
-          >
-            {t.app.quiz.backToPractice}
-            <ArrowRight className="size-4" />
-          </button>
-        </div>
+      <div className="mt-6 flex gap-3">
+        <button
+          type="button"
+          onClick={handleRestart}
+          className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-slate-600 p-3 text-white transition-colors hover:bg-slate-800"
+        >
+          <RotateCcw className="size-4" />
+          {t.app.quiz.retake}
+        </button>
+        <button
+          type="button"
+          onClick={handleBackToPractice}
+          className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-cyan-500 p-3 font-semibold text-white transition-colors hover:bg-cyan-400"
+        >
+          {t.app.quiz.backToPractice}
+          <ArrowRight className="size-4" />
+        </button>
+      </div>
       </>
     )
   }
@@ -319,28 +388,60 @@ function QuizContent({ config, topicId }: { config?: QuizSubjectConfig; topicId?
   return (
     <>
       <div className="mb-6">
-        <p className="text-sm font-medium text-cyan-400">{config?.title || topicId || "แบบทดสอบ"}</p>
-        <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">
-          {t.app.quiz.questionCount(currentQuestion + 1, questions.length)}
-        </h1>
-        <p className="mt-2 text-slate-400">{config?.description || "ทดสอบความรู้ของคุณ"}</p>
+        <div className="mb-2 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-cyan-400">{currentQuestion.topicName || topicId}</p>
+            <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">
+              {t.app.quiz.questionCount(currentQuestionIdx + 1, questions.length)}
+            </h1>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 text-sm text-red-400">
+              <span className="text-lg">❤️</span>
+              <span className="font-semibold">{quizHearts}</span>
+            </div>
+          </div>
+        </div>
+        <p className="mt-2 text-slate-400">
+          ระดับ: {currentQuestion.difficulty === "easy" ? "ง่าย" : currentQuestion.difficulty === "medium" ? "ปานกลาง" : "ยาก"}
+        </p>
       </div>
 
       <div className="mb-6">
         <div className="mb-2 flex justify-between text-xs text-slate-400">
           <span>{t.app.quiz.progressLabel}</span>
-          <span>{Math.round((currentQuestion / questions.length) * 100)}%</span>
+          <span>{Math.round((currentQuestionIdx / questions.length) * 100)}%</span>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-slate-700">
           <div
             className="h-full rounded-full bg-cyan-500 transition-all duration-300"
-            style={{ width: `${(currentQuestion / questions.length) * 100}%` }}
+            style={{ width: `${(currentQuestionIdx / questions.length) * 100}%` }}
           />
         </div>
       </div>
 
+      {quizEnded && (
+        <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-center">
+          <p className="text-lg font-semibold text-red-300">หัวใจหมดแล้ว!</p>
+          <p className="mt-1 text-sm text-red-400">คุณสามารถเริ่มใหม่ได้เลย</p>
+          <button
+            type="button"
+            onClick={() => {
+              setQuizHearts(5)
+              setQuizEnded(false)
+              setCurrentQuestionIdx(0)
+              setAnswers([])
+              setSelectedAnswer(null)
+            }}
+            className="mt-3 rounded-lg bg-red-500 px-4 py-2 text-sm font-semibold text-white hover:bg-red-400"
+          >
+            ลองอีกครั้ง
+          </button>
+        </div>
+      )}
+
       {/* Hint panel */}
-      {showHints && normalizedQuestion.hints && normalizedQuestion.hints.length > 0 && (
+      {showHints && currentQuestion.hints && currentQuestion.hints.length > 0 && (
         <div className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -356,7 +457,7 @@ function QuizContent({ config, topicId }: { config?: QuizSubjectConfig; topicId?
             </button>
           </div>
           <div className="rounded-lg bg-slate-900/50 p-3">
-            <p className="text-sm text-amber-200">{normalizedQuestion.hints[hintStep]}</p>
+            <p className="text-sm text-amber-200">{currentQuestion.hints[hintStep]}</p>
           </div>
           <div className="mt-3 flex items-center justify-between">
             <button
@@ -368,12 +469,12 @@ function QuizContent({ config, topicId }: { config?: QuizSubjectConfig; topicId?
               {t.app.quiz.previous}
             </button>
             <span className="text-xs text-amber-400">
-              {t.app.quiz.hintStep(hintStep + 1, normalizedQuestion.hints.length)}
+              {t.app.quiz.hintStep(hintStep + 1, currentQuestion.hints.length)}
             </span>
             <button
               type="button"
               onClick={handleNextHint}
-              disabled={hintStep >= normalizedQuestion.hints.length - 1}
+              disabled={hintStep >= currentQuestion.hints.length - 1}
               className="rounded border border-amber-500/30 px-3 py-1 text-xs text-amber-400 transition-colors hover:bg-amber-500/20 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {t.app.quiz.next}
@@ -384,8 +485,8 @@ function QuizContent({ config, topicId }: { config?: QuizSubjectConfig; topicId?
 
       <section className={panelClassName}>
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">{normalizedQuestion.question}</h2>
-          {normalizedQuestion.hints && normalizedQuestion.hints.length > 0 && !showHints && (
+          <h2 className="text-lg font-semibold text-white">{currentQuestion.question}</h2>
+          {currentQuestion.hints && currentQuestion.hints.length > 0 && !showHints && (
             <button
               type="button"
               onClick={handleToggleHints}
@@ -398,7 +499,7 @@ function QuizContent({ config, topicId }: { config?: QuizSubjectConfig; topicId?
         </div>
 
         <div className="space-y-3">
-          {normalizedQuestion.options.map((option: string, index: number) => (
+          {currentQuestion.choices.map((option: string, index: number) => (
             <button
               key={option}
               type="button"
@@ -429,12 +530,12 @@ function QuizContent({ config, topicId }: { config?: QuizSubjectConfig; topicId?
           <button
             type="button"
             onClick={() => {
-              if (currentQuestion > 0) {
-                setCurrentQuestion(currentQuestion - 1)
+              if (currentQuestionIdx > 0) {
+                setCurrentQuestionIdx(currentQuestionIdx - 1)
                 setSelectedAnswer(null)
               }
             }}
-            disabled={currentQuestion === 0}
+            disabled={currentQuestionIdx === 0}
             className="rounded-lg border border-slate-600 px-4 py-2 text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {t.app.quiz.previous}
@@ -476,10 +577,14 @@ function ResultCard({
   )
 }
 
-function getScore(answers: number[], config: QuizSubjectConfig | undefined, questions: { correctAnswer: number }[]) {
+function getScore(answers: number[], questions: QuizQuestion[]) {
   return answers.reduce((acc, answer, index) => {
-    return acc + (answer === questions[index].correctAnswer ? 1 : 0)
+    return acc + (answer === questions[index].answer ? 1 : 0)
   }, 0)
+}
+
+function getTotalForTopic(topicId: string): number {
+  return getQuestionsForTopic(topicId).length
 }
 
 function saveQuizProgress({
@@ -490,14 +595,16 @@ function saveQuizProgress({
   score,
   percentage,
   timeSpentMinutes,
+  wrongIds,
 }: {
   userId: string
-  subject: QuizSubjectConfig["subject"]
+  subject: string
   title: string
   questionCount: number
   score: number
   percentage: number
   timeSpentMinutes: number
+  wrongIds: string[]
 }): User | null {
   const users = getStoredUsers()
   const userIndex = users.findIndex((entry) => entry.id === userId)
@@ -510,7 +617,7 @@ function saveQuizProgress({
   const nextAccuracy = Math.round(((previousCorrect + score) / nextQuestionsDone) * 100)
   const nextSubjectProgress = {
     ...user.stats.subjectProgress,
-    [subject]: Math.max(user.stats.subjectProgress[subject] ?? 0, percentage),
+    [subject]: Math.max(user.stats.subjectProgress[subject as keyof typeof user.stats.subjectProgress] ?? 0, percentage),
   }
   const selectedSubjects = user.onboarding?.subjects ?? []
   const progressValues = selectedSubjects.map((item) => nextSubjectProgress[item] ?? 0)
@@ -552,15 +659,6 @@ function saveQuizResult(result: QuizResult) {
   const quizResults = JSON.parse(window.localStorage.getItem(QUIZ_RESULTS_KEY) || "[]") as QuizResult[]
   quizResults.push(result)
   window.localStorage.setItem(QUIZ_RESULTS_KEY, JSON.stringify(quizResults))
-}
-
-function shuffleArray<T>(array: T[]): T[] {
-  const shuffled = [...array]
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-  }
-  return shuffled
 }
 
 function getStoredUsers(): User[] {

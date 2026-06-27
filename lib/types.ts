@@ -24,6 +24,8 @@ export type LearningGoal =
   | "Exam Preparation"
   | "A-Level Preparation"
 
+export type UserRole = "student" | "teacher" | "admin"
+
 export interface OnboardingData {
   grade: Grade
   subjects: Subject[]
@@ -40,17 +42,26 @@ export interface UserStats {
   overallProgress: number
   subjectProgress: Partial<Record<Subject, number>>
   curriculumProgress: Partial<Record<CurriculumLevel, number>>
+  xp: number
+  level: number
+  hearts: number
+  achievements: string[]
+  longestStreak: number
+  perfectQuizzes: number
+  lessonsCompleted: number
+  lastStudyDate?: string
 }
 
 export interface Activity {
   id: string
   title: string
-  type: "quiz" | "practice"
+  type: "quiz" | "practice" | "lesson" | "achievement"
   score?: number
   questions: number
   completed: number
   date: string
   status: "completed" | "in-progress"
+  xpEarned?: number
 }
 
 export interface User {
@@ -59,6 +70,7 @@ export interface User {
   email: string
   password: string
   isGuest?: boolean
+  role: UserRole
   onboarding: OnboardingData | null
   stats: UserStats
   activities: Activity[]

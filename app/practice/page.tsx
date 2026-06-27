@@ -1,13 +1,14 @@
 "use client"
 
 import Link from "next/link"
-import { BookOpen, Clock, Target, Sparkles } from "lucide-react"
+import { BookOpen, Clock, Target, Sparkles, CheckCircle2, Lock } from "lucide-react"
 import { AuthGuard } from "@/components/auth-guard"
 import { DashboardShell } from "@/components/dashboard-shell"
 import { useAuth } from "@/hooks/use-auth"
 import { useLanguage } from "@/components/language-provider"
 import { getSubjectBgTint, getSubjectColor, getSubjectTextColor, innerCardClassName, panelClassName } from "@/lib/dashboard-utils"
 import { getCurriculumTopicsForLevel, CURRICULUM_LABELS, gradeToCurriculum } from "@/lib/curriculum"
+import { getLessonProgress, getNextLesson, getPreviousLesson } from "@/lib/lesson-bank"
 
 export default function PracticePage() {
   return (
@@ -40,39 +41,76 @@ function PracticeContent() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {topics.map((topic) => {
-          const progress = user.stats.subjectProgress[topic.subject] ?? 0
+      {/* Learning Path */}
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold text-white">เส้นทางการเรียน</h2>
+        <p className="mt-1 text-sm text-slate-400">เรียนตามลำดับเพื่อผลลัพธ์ที่ดีที่สุด</p>
+      </div>
+
+      <div className="mb-8 space-y-3">
+        {topics.map((topic, index) => {
+          const lessonProgress = getLessonProgress(topic.id)
+          const isCompleted = lessonProgress?.status === "completed"
+          const isStudying = lessonProgress?.status === "studying"
+          const prevTopic = index > 0 ? topics[index - 1] : null
+          const prevCompleted = prevTopic ? getLessonProgress(prevTopic.id)?.status === "completed" : true
+          const isLocked = !prevCompleted && index > 0
+
           return (
-            <article key={topic.id} className={panelClassName}>
-              <span
-                className={`mb-4 flex size-12 items-center justify-center rounded-xl ${getSubjectBgTint(topic.subject)}`}
-              >
-                <BookOpen className={`size-6 ${getSubjectTextColor(topic.subject)}`} />
-              </span>
-              <h2 className="text-lg font-semibold text-white">{topic.title}</h2>
-              <p className="mt-1 text-sm text-slate-400">
-                {topic.description}
-              </p>
-              <div className="mt-4">
-                <div className="mb-1 flex justify-between text-xs">
-                  <span className="text-slate-400">{t.app.common.mastery}</span>
-                  <span className="text-white">{progress}%</span>
-                </div>
-                <div className="h-2 overflow-hidden rounded-full bg-slate-700">
-                  <div
-                    className={`h-full rounded-full ${getSubjectColor(topic.subject)}`}
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
+            <div
+              key={topic.id}
+              className={`flex items-center gap-4 rounded-xl border p-4 transition-all ${
+                isCompleted
+                  ? "border-emerald-500/30 bg-emerald-500/5"
+                  : isStudying
+                    ? "border-cyan-500/30 bg-cyan-500/5"
+                    : isLocked
+                      ? "border-slate-700 bg-slate-800/30 opacity-60"
+                      : "border-slate-700 bg-slate-800/50"
+              }`}
+            >
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-full">
+                {isCompleted ? (
+                  <span className="text-2xl">✅</span>
+                ) : isStudying ? (
+                  <span className="text-2xl">📖</span>
+                ) : isLocked ? (
+                  <Lock className="size-5 text-slate-500" />
+                ) : (
+                  <span className="text-lg text-slate-400">{index + 1}</span>
+                )}
               </div>
-              <Link
-                href={`/quiz/${topic.id}`}
-                className="mt-5 block w-full rounded-lg bg-cyan-500 p-3 text-sm font-semibold text-white transition-colors hover:bg-cyan-400 text-center"
-              >
-                {t.app.practicePage.startQuiz}
-              </Link>
-            </article>
+
+              <div className="flex-1 min-w-0">
+                <h3 className={`text-sm font-semibold ${isLocked ? "text-slate-500" : "text-white"}`}>
+                  {topic.title}
+                </h3>
+                <p className="mt-0.5 text-xs text-slate-400">{topic.description}</p>
+              </div>
+
+              <div className="flex shrink-0 gap-2">
+                {!isLocked && (
+                  <Link
+                    href={`/lesson/${topic.id}`}
+                    className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                      isCompleted
+                        ? "border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10"
+                        : "border border-slate-600 text-white hover:bg-slate-800"
+                    }`}
+                  >
+                    {isCompleted ? "เรียนแล้ว" : "เรียน"}
+                  </Link>
+                )}
+                {!isLocked && (
+                  <Link
+                    href={`/quiz/${topic.id}`}
+                    className="rounded-lg bg-cyan-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-cyan-400"
+                  >
+                    โจทย์
+                  </Link>
+                )}
+              </div>
+            </div>
           )
         })}
       </div>

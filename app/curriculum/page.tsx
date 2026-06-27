@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { BookOpen, CheckCircle2, RotateCcw } from "lucide-react"
+import { BookOpen, CheckCircle2, RotateCcw, PlayCircle } from "lucide-react"
 import { AuthGuard } from "@/components/auth-guard"
 import { DashboardShell } from "@/components/dashboard-shell"
 import { useAuth } from "@/hooks/use-auth"
@@ -9,6 +9,7 @@ import { useLanguage } from "@/components/language-provider"
 import { panelClassName } from "@/lib/dashboard-utils"
 import type { CurriculumLevel } from "@/lib/types"
 import { CURRICULUM_BY_LEVEL, CURRICULUM_LABELS, getCurriculumTopicsForLevel } from "@/lib/curriculum"
+import { getLessonProgress } from "@/lib/lesson-bank"
 
 export default function CurriculumPage() {
   return (
@@ -125,6 +126,8 @@ function CurriculumContent() {
             const isSelected = selectedCurriculum === level
             const isCurrent = currentCurriculum === level
 
+            const completedLessons = topics.filter((t) => getLessonProgress(t.id)?.status === "completed").length
+
             return (
               <div
                 key={level}
@@ -152,6 +155,10 @@ function CurriculumContent() {
                   <div className="flex justify-between text-slate-400">
                     <span>หัวข้อ:</span>
                     <span className="font-medium text-white">{topics.length * 3}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-400">
+                    <span>บทเรียนที่เรียนแล้ว:</span>
+                    <span className="font-medium text-emerald-400">{completedLessons}/{topics.length}</span>
                   </div>
                   <div className="flex justify-between text-slate-400">
                     <span>ความคืบหน้า:</span>

@@ -42,13 +42,13 @@ export const CURRICULUM_BY_LEVEL: Record<CurriculumLevel, CurriculumTopic[]> = {
   M3: [
     { id: "m3-quadratics", title: "สมการกำลังสอง", description: "การแก้สมการกำลังสอง แยกตัวประกอบ สูตร quadratic", subject: "Algebra" },
     { id: "m3-functions", title: "ฟังก์ชัน", description: "ฟังก์ชันต่างๆ การประยุกต์ใช้", subject: "Algebra" },
-    { id: "m3-trigonometry", title: "ตรีโกณมิติ", description: "sin cos tan ของมุม特别 30 45 60", subject: "Trigonometry" },
+    { id: "m3-trigonometry", title: "ตรีโกณมิติ", description: "sin cos tan ของมุม 30 45 60 องศา", subject: "Trigonometry" },
     { id: "m3-triangle-trig", title: "ตรีโกณมิติสามเหลี่ยม", description: "การประยุกต์ใช้ในสามเหลี่ยมมุมฉาก", subject: "Trigonometry" },
     { id: "m3-geometry-apps", title: "การประยุกต์เรขาคณิต", description: "พื้นที่ ปริมาตร การคำนวณ", subject: "Geometry" },
   ],
   M4: [
-    { id: "m4-advanced-algebra", title: "พีชคณิตขั้นสูง", description: "สม方程 radicals การแก้สมการซับซ้อน", subject: "Algebra" },
-    { id: "m4-sequences", title: "ลำดับและอนุกรม", description: "ลำดับเลขคณิต ลำดับเลขเรียง成分", subject: "Algebra" },
+    { id: "m4-advanced-algebra", title: "พีชคณิตขั้นสูง", description: "สมการ radicals การแก้สมการซับซ้อน", subject: "Algebra" },
+    { id: "m4-sequences", title: "ลำดับและอนุกรม", description: "ลำดับเลขคณิต ลำดับเรขาคณิต", subject: "Algebra" },
     { id: "m4-coordinate-geometry", title: "เรขาคณิตพิกัด", description: "ระยะระหว่างจุด เส้นตรง ในระบบพิกัด", subject: "Geometry" },
     { id: "m4-circles", title: "วงกลม", description: "สมมติติวงกลม มุม inscribed", subject: "Geometry" },
     { id: "m4-statistics-advanced", title: "สถิติขั้นสูง", description: "การกระจาย ความเบี่ยงเบน", subject: "Statistics" },
@@ -56,8 +56,8 @@ export const CURRICULUM_BY_LEVEL: Record<CurriculumLevel, CurriculumTopic[]> = {
   M5: [
     { id: "m5-trigonometry-advanced", title: "ตรีโกณมิติขั้นสูง", description: "เอกลักษณ์ตรีโกณ มุมอ้างอิง", subject: "Trigonometry" },
     { id: "m5-calculus-basics", title: "แคลคูลัสพื้นฐาน", description: "ลิมิต อัตราการเปลี่ยนแปลง", subject: "Calculus" },
-    { id: "m5-derivatives", title: "อนุพันธ์", description: "กฎอนุพันธ์ การ导数的应用", subject: "Calculus" },
-    { id: "m5-probability-advanced", title: "ความน่าจะเป็นขั้นสูง", description: "การแจกแจง ความน่าจะเป็นусловная", subject: "Statistics" },
+    { id: "m5-derivatives", title: "อนุพันธ์", description: "กฎอนุพันธ์ การประยุกต์ใช้อนุพันธ์", subject: "Calculus" },
+    { id: "m5-probability-advanced", title: "ความน่าจะเป็นขั้นสูง", description: "การแจกแจง ความน่าจะเป็นแบบมีเงื่อนไข", subject: "Statistics" },
   ],
   M6: [
     { id: "m6-limits", title: "ลิมิต", description: "ลิมิตของฟังก์ชัน การหาลิมิต", subject: "Calculus" },
