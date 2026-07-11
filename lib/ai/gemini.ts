@@ -5,7 +5,9 @@ import { buildSystemPrompt, buildTutorPrompt, buildSummaryPrompt, buildQuizPromp
 const TIMEOUT_MS = 30000
 const RETRY_COUNT = 1
 const MAX_CONTINUATIONS = 3
-const MODEL = "gemini-2.5-flash"
+const PRIMARY_MODEL = "gemini-2.5-flash"
+const FALLBACK_MODEL = "gemini-2.0-flash"
+const MAX_RETRIES = 3
 
 function getApiKey(): string {
   const key = process.env.GOOGLE_AI_API_KEY
@@ -83,8 +85,26 @@ function isTruncated(finishReason: string): boolean {
   return finishReason === "MAX_TOKENS" || finishReason === "SAFETY" || finishReason === "RECITATION"
 }
 
+function isServiceUnavailable(error: unknown): boolean {
+  if (error instanceof Error) {
+    const message = error.message.toLowerCase()
+    return (
+      message.includes("503") ||
+      message.includes("service unavailable") ||
+      message.includes("overloaded") ||
+      message.includes("high demand")
+    )
+  }
+  return false
+}
+
+async function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 async function callGeminiWithTimeout(
   genAI: GoogleGenerativeAI,
+  modelName: string,
   systemPrompt: string,
   userPrompt: string,
   continuationCount = 0
@@ -93,7 +113,7 @@ async function callGeminiWithTimeout(
   const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS)
 
   try {
-    const model = genAI.getGenerativeModel({ model: MODEL })
+    const model = genAI.getGenerativeModel({ model: modelName })
 
     const result = await model.generateContent({
       contents: [
@@ -132,14 +152,67 @@ export async function askGemini(mode: AIMode, prompt: string, context?: string):
   const systemPrompt = buildSystemPrompt(mode)
   const userPrompt = buildPrompt(mode, prompt, context)
 
-  let lastError: Error | null = null
   let currentPrompt = userPrompt
   let fullResponse = ""
   let continuationCount = 0
+  let currentModel = PRIMARY_MODEL
 
-  for (let attempt = 0; attempt <= RETRY_COUNT; attempt++) {
+  if (process.env.NODE_ENV === "development") {
+    console.log(`[Gemini] Using model: ${PRIMARY_MODEL}`)
+  }
+
+  // Try primary model first
+  try {
+    const result = await callGeminiWithTimeout(genAI, PRIMARY_MODEL, systemPrompt, currentPrompt, continuationCount)
+    fullResponse += result.text
+    continuationCount = result.continuationCount
+
+    if (process.env.NODE_ENV === "development") {
+      console.log(`[Gemini] Continuation: ${continuationCount}`)
+      console.log(`[Gemini] FinishReason: ${result.finishReason}`)
+    }
+
+    if (isTruncated(result.finishReason) && continuationCount < MAX_CONTINUATIONS) {
+      continuationCount++
+      currentPrompt = `${userPrompt}\n\nContinue exactly where you stopped.\nDo not repeat previous text.\nContinue from the last unfinished sentence.\nFinish the explanation completely.\n\nPrevious response:\n${fullResponse}\n\nContinue:`
+      
+      if (process.env.NODE_ENV === "development") {
+        console.log(`[Gemini] Attempting continuation ${continuationCount}/${MAX_CONTINUATIONS}`)
+      }
+      
+      const continueResult = await callGeminiWithTimeout(genAI, PRIMARY_MODEL, systemPrompt, currentPrompt, continuationCount)
+      fullResponse += continueResult.text
+    }
+
+    if (process.env.NODE_ENV === "development") {
+      console.log(`[Gemini] Final Characters: ${fullResponse.length}`)
+    }
+
+    return sanitizeResponse(fullResponse)
+  } catch (error) {
+    // If primary model fails with 503, try fallback
+    if (isServiceUnavailable(error)) {
+      if (process.env.NODE_ENV === "development") {
+        console.log(`[Gemini] Switched to: ${FALLBACK_MODEL}`)
+      }
+      currentModel = FALLBACK_MODEL
+    } else {
+      // For non-503 errors, return partial response or throw
+      if (fullResponse) {
+        return sanitizeResponse(fullResponse)
+      }
+      throw error
+    }
+  }
+
+  // Try fallback model with retries
+  for (let retry = 1; retry <= MAX_RETRIES; retry++) {
     try {
-      const result = await callGeminiWithTimeout(genAI, systemPrompt, currentPrompt, continuationCount)
+      if (process.env.NODE_ENV === "development") {
+        console.log(`[Gemini] Retry ${retry}...`)
+      }
+
+      const result = await callGeminiWithTimeout(genAI, FALLBACK_MODEL, systemPrompt, currentPrompt, continuationCount)
       fullResponse += result.text
       continuationCount = result.continuationCount
 
@@ -148,7 +221,6 @@ export async function askGemini(mode: AIMode, prompt: string, context?: string):
         console.log(`[Gemini] FinishReason: ${result.finishReason}`)
       }
 
-      // Check if response was truncated and we can continue
       if (isTruncated(result.finishReason) && continuationCount < MAX_CONTINUATIONS) {
         continuationCount++
         currentPrompt = `${userPrompt}\n\nContinue exactly where you stopped.\nDo not repeat previous text.\nContinue from the last unfinished sentence.\nFinish the explanation completely.\n\nPrevious response:\n${fullResponse}\n\nContinue:`
@@ -156,7 +228,9 @@ export async function askGemini(mode: AIMode, prompt: string, context?: string):
         if (process.env.NODE_ENV === "development") {
           console.log(`[Gemini] Attempting continuation ${continuationCount}/${MAX_CONTINUATIONS}`)
         }
-        continue
+        
+        const continueResult = await callGeminiWithTimeout(genAI, FALLBACK_MODEL, systemPrompt, currentPrompt, continuationCount)
+        fullResponse += continueResult.text
       }
 
       if (process.env.NODE_ENV === "development") {
@@ -165,28 +239,26 @@ export async function askGemini(mode: AIMode, prompt: string, context?: string):
 
       return sanitizeResponse(fullResponse)
     } catch (error) {
-      lastError = error instanceof Error ? error : new Error("UNKNOWN_ERROR")
-
-      if (error instanceof Error && error.name === "AbortError") {
-        if (attempt < RETRY_COUNT) {
-          continue
+      if (retry < MAX_RETRIES) {
+        const backoffMs = Math.pow(2, retry - 1) * 1000
+        if (process.env.NODE_ENV === "development") {
+          console.log(`[Gemini] Waiting ${backoffMs}ms before retry...`)
         }
-        throw new Error("TIMEOUT")
-      }
-
-      if (attempt < RETRY_COUNT) {
-        continue
+        await sleep(backoffMs)
+      } else {
+        // All retries failed
+        if (fullResponse) {
+          return sanitizeResponse(fullResponse)
+        }
+        throw new Error("ขณะนี้ AI มีผู้ใช้งานจำนวนมาก กรุณาลองใหม่อีกครั้งในอีกสักครู่")
       }
     }
   }
 
-  // If we have a partial response, return it instead of throwing
+  // Should not reach here, but just in case
   if (fullResponse) {
-    if (process.env.NODE_ENV === "development") {
-      console.log(`[Gemini] Returning partial response due to error: ${fullResponse.length} characters`)
-    }
     return sanitizeResponse(fullResponse)
   }
 
-  throw lastError || new Error("UNKNOWN_ERROR")
+  throw new Error("ขณะนี้ AI มีผู้ใช้งานจำนวนมาก กรุณาลองใหม่อีกครั้งในอีกสักครู่")
 }
