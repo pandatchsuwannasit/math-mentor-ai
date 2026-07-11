@@ -1,65 +1,63 @@
-import { BrainCircuit, Route, BarChart3, GraduationCap, FileText, PieChart } from "lucide-react"
+import { BookOpen, BarChart3, Target, GraduationCap, CheckCircle2, Sparkles } from "lucide-react"
 
 const FEATURES = [
   {
-    icon: BrainCircuit,
-    title: "AI-generated Practice Questions",
-    description: "Unlimited personalized questions tailored to your learning level and goals.",
-    tint: "bg-brand/10 text-brand",
+    icon: BookOpen,
+    title: "โจทย์ฝึกที่สร้างด้วย AI",
+    description: "โจทย์ไม่จำกัดที่ปรับให้เหมาะกับระดับและเป้าหมายการเรียนของคุณ",
   },
   {
-    icon: Route,
-    title: "Personalized Learning Paths",
-    description: "AI creates custom study plans that adapt to your progress and pace.",
-    tint: "bg-emerald-500/10 text-emerald-500",
+    icon: Target,
+    title: "เส้นทางการเรียนเฉพาะบุคคล",
+    description: "AI สร้างแผนการเรียนที่ปรับตามความก้าวหน้าและจังหวะของคุณ",
   },
   {
     icon: BarChart3,
-    title: "Strength & Weakness Analysis",
-    description: "Detailed insights into your performance to help you focus on what matters.",
-    tint: "bg-violet-500/10 text-violet-500",
+    title: "วิเคราะห์จุดแข็งจุดอ่อน",
+    description: "ข้อมูลเชิงลึกเกี่ยวกับผลการเรียนเพื่อช่วยให้คุณโฟกัสในสิ่งที่สำคัญ",
   },
   {
     icon: GraduationCap,
-    title: "Exam Preparation (A-Level, NETSAT)",
-    description: "Specialized preparation for A-Level Mathematics and NETSAT exams.",
-    tint: "bg-orange-500/10 text-orange-500",
+    title: "เตรียมสอบ (A-Level, NETSAT)",
+    description: "การเตรียมสอบเฉพาะทางสำหรับคณิตศาสตร์ A-Level และ NETSAT",
   },
   {
-    icon: FileText,
-    title: "Step-by-Step Solutions",
-    description: "Detailed, easy-to-understand solutions for every question you attempt.",
-    tint: "bg-sky-500/10 text-sky-500",
+    icon: CheckCircle2,
+    title: "เฉลยทีละขั้นตอน",
+    description: "เฉลยที่ละเอียดและเข้าใจง่ายสำหรับทุกโจทย์ที่คุณทำ",
   },
   {
-    icon: PieChart,
-    title: "Learning Statistics Dashboard",
-    description: "Track your progress with beautiful charts and meaningful analytics.",
-    tint: "bg-teal-500/10 text-teal-500",
+    icon: Sparkles,
+    title: "แดชบอร์ดสถิติการเรียน",
+    description: "ติดตามความก้าวหน้าด้วยกราฟสวยงามและการวิเคราะห์ที่มีความหมาย",
   },
 ]
 
 export function Features() {
   return (
-    <section
-      id="features"
-      className="relative z-10 -mt-12 rounded-t-[2.5rem] bg-section-light text-section-light-foreground"
-    >
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-          {FEATURES.map((feature) => (
-            <article
-              key={feature.title}
-              className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-md"
+    <section className="py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            ทุกสิ่งที่คุณต้องการเพื่อเก่งคณิต
+          </h2>
+          <p className="mt-4 text-lg text-slate-400">
+            เครื่องมือครบครันที่ออกแบบมาเพื่อช่วยให้นักเรียนไทยพิชิตคณิตศาสตร์ระดับมัธยมปลายและการสอบเข้ามหาวิทยาลัย
+          </p>
+        </div>
+
+        <div className="mt-20 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {FEATURES.map((feature, index) => (
+            <div
+              key={index}
+              className="group relative rounded-2xl border border-slate-800 bg-slate-900/50 p-6 transition-all duration-300 hover:border-cyan-500/30 hover:bg-slate-900/80 card-hover"
             >
-              <span className={`mb-4 flex size-12 items-center justify-center rounded-xl ${feature.tint}`}>
+              <div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400">
                 <feature.icon className="size-6" />
-              </span>
-              <h3 className="text-pretty text-base font-bold leading-snug">{feature.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-section-light-muted">
-                {feature.description}
-              </p>
-            </article>
+              </div>
+              <h3 className="text-lg font-semibold text-white">{feature.title}</h3>
+              <p className="mt-2 text-sm text-slate-400">{feature.description}</p>
+            </div>
           ))}
         </div>
       </div>

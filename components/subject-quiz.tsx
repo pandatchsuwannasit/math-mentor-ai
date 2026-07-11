@@ -124,7 +124,7 @@ function QuizContent({ topicId }: { topicId?: string }) {
           <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 animate-pulse">
             <Loader2 className="size-8 text-cyan-400 animate-spin" />
           </div>
-          <p className="text-sm text-[#64748B]">Loading questions...</p>
+          <p className="text-sm text-[#64748B]">{t.app.common.loadingQuestions}</p>
         </div>
       </div>
     )
@@ -472,7 +472,7 @@ function QuizContent({ topicId }: { topicId?: string }) {
                 ? "bg-amber-500/10 text-amber-400 ring-amber-500/20"
                 : "bg-red-500/10 text-red-400 ring-red-500/20"
           }`}>
-            {currentQuestion.difficulty === "easy" ? "Easy" : currentQuestion.difficulty === "medium" ? "Medium" : "Hard"}
+            {currentQuestion.difficulty === "easy" ? t.app.common.easy : currentQuestion.difficulty === "medium" ? t.app.common.medium : t.app.common.hard}
           </div>
         </div>
       </div>
@@ -495,8 +495,8 @@ function QuizContent({ topicId }: { topicId?: string }) {
       {quizEnded && (
         <div className="rounded-2xl border border-red-500/20 bg-gradient-to-br from-red-500/10 to-red-500/5 p-6 text-center fade-in">
           <Heart className="mx-auto size-10 text-red-400" />
-          <p className="mt-3 text-lg font-semibold text-red-300">No hearts remaining!</p>
-          <p className="mt-1 text-sm text-red-400">You can retry the quiz.</p>
+          <p className="mt-3 text-lg font-semibold text-red-300">{t.app.common.noHearts}</p>
+          <p className="mt-1 text-sm text-red-400">{t.app.common.tryAgain}</p>
           <button
             type="button"
             onClick={() => {
@@ -509,7 +509,7 @@ function QuizContent({ topicId }: { topicId?: string }) {
             className="btn-primary mt-4 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-red-500 to-red-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-500/20 transition-all duration-200 hover:shadow-xl hover:shadow-red-500/30"
           >
             <RotateCcw className="size-4" />
-            Try Again
+            {t.app.common.tryAgain}
           </button>
         </div>
       )}
@@ -714,7 +714,7 @@ function saveQuizProgress({
         score: percentage,
         questions: questionCount,
         completed: questionCount,
-        date: "Just now",
+        date: new Date().toLocaleDateString("th-TH"),
         status: "completed",
       },
       ...user.activities,
