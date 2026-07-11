@@ -52,32 +52,18 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       response,
     })
   } catch (error) {
-    const message = error instanceof Error ? error.message : "UNKNOWN_ERROR"
+    console.error("===== GEMINI ERROR =====")
+    console.error(error)
 
-    if (message === "API_KEY_MISSING") {
-      return NextResponse.json({
+    return NextResponse.json(
+      {
         success: false,
-        error: "AI is temporarily unavailable.",
-      }, { status: 503 })
-    }
-
-    if (message === "TIMEOUT") {
-      return NextResponse.json({
-        success: false,
-        error: "The AI took too long to respond. Please try again.",
-      }, { status: 504 })
-    }
-
-    if (message === "EMPTY_RESPONSE") {
-      return NextResponse.json({
-        success: false,
-        error: "The AI returned an empty response. Please try again.",
-      }, { status: 500 })
-    }
-
-    return NextResponse.json({
-      success: false,
-      error: "An error occurred while processing your request. Please try again.",
-    }, { status: 500 })
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unknown server error",
+      },
+      { status: 500 }
+    )
   }
 }

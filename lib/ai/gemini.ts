@@ -84,7 +84,7 @@ function isTruncated(finishReason: string): boolean {
 }
 
 async function callGeminiWithTimeout(
-  ai: GoogleGenAI,
+  genAI: GoogleGenerativeAI,
   systemPrompt: string,
   userPrompt: string,
   continuationCount = 0
@@ -93,19 +93,21 @@ async function callGeminiWithTimeout(
   const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS)
 
   try {
-    const response = await ai.models.generateContent({
-      model: MODEL,
+    const model = genAI.getGenerativeModel({ model: MODEL })
+
+    const result = await model.generateContent({
       contents: [
         { role: "user", parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] },
       ],
-      config: {
+      generationConfig: {
         temperature: 0.3,
         maxOutputTokens: 4096,
       },
     })
 
     clearTimeout(timeoutId)
-    const text = response.text || ""
+    const response = result.response
+    const text = response.text()
     const finishReason = getFinishReason(response)
 
     if (process.env.NODE_ENV === "development") {
@@ -126,7 +128,7 @@ async function callGeminiWithTimeout(
 
 export async function askGemini(mode: AIMode, prompt: string, context?: string): Promise<string> {
   const apiKey = getApiKey()
-  const ai = new GoogleGenAI({ apiKey })
+  const genAI = new GoogleGenerativeAI(apiKey)
   const systemPrompt = buildSystemPrompt(mode)
   const userPrompt = buildPrompt(mode, prompt, context)
 
@@ -137,7 +139,7 @@ export async function askGemini(mode: AIMode, prompt: string, context?: string):
 
   for (let attempt = 0; attempt <= RETRY_COUNT; attempt++) {
     try {
-      const result = await callGeminiWithTimeout(ai, systemPrompt, currentPrompt, continuationCount)
+      const result = await callGeminiWithTimeout(genAI, systemPrompt, currentPrompt, continuationCount)
       fullResponse += result.text
       continuationCount = result.continuationCount
 
