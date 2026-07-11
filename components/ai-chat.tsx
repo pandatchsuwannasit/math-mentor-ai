@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Sparkles, Loader2, X, Send } from "lucide-react"
+import { Sparkles, Loader2, X, Send, AlertTriangle } from "lucide-react"
 import { useAI } from "@/hooks/use-ai"
 import type { AIMode } from "@/types/ai"
 import { panelClassName, innerCardClassName } from "@/lib/dashboard-utils"
@@ -79,8 +79,23 @@ export function AIChat({
       )}
 
       {error && (
-        <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
-          {error}
+        <div className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
+          <div className="flex items-start gap-3">
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-amber-500/20">
+              <AlertTriangle className="size-5 text-amber-400" />
+            </div>
+            <div className="flex-1 space-y-2">
+              <p className="text-sm font-semibold text-amber-300">
+                ⚠️ ขออภัย ขณะนี้มีผู้ใช้งาน AI เป็นจำนวนมาก จึงไม่สามารถให้บริการได้ชั่วคราว
+              </p>
+              <p className="text-sm text-amber-200/80">
+                โปรดลองใหม่อีกครั้งในอีกสักครู่
+              </p>
+              <p className="text-xs text-amber-300/70">
+                หมายเหตุ: เว็บไซต์นี้ยังอยู่ในเวอร์ชันทดลอง (Beta) จึงอาจพบข้อผิดพลาดหรือการให้บริการไม่เสถียรในบางช่วงเวลา ขออภัยในความไม่สะดวก
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
