@@ -12,6 +12,12 @@ import {
   Target,
   TrendingUp,
   XCircle,
+  ChevronLeft,
+  ChevronRight,
+  Heart,
+  Sparkles,
+  Star,
+  Trophy,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import { AuthGuard } from "@/components/auth-guard"
@@ -68,6 +74,7 @@ function QuizContent({ topicId }: { topicId?: string }) {
   const [quizEnded, setQuizEnded] = useState(false)
   const [showCelebration, setShowCelebration] = useState(false)
   const [celebrationData, setCelebrationData] = useState({ xp: 0, levelUp: false, newLevel: 1, achievement: "" })
+  const [animatingAnswer, setAnimatingAnswer] = useState<number | null>(null)
 
   // Load and randomize questions on mount using adaptive difficulty
   useEffect(() => {
@@ -113,9 +120,11 @@ function QuizContent({ topicId }: { topicId?: string }) {
   if (isLoading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="mx-auto size-12 animate-spin text-cyan-400" />
-          <p className="mt-4 text-sm text-slate-400">กำลังโหลดคำถาม...</p>
+        <div className="text-center space-y-4">
+          <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 animate-pulse">
+            <Loader2 className="size-8 text-cyan-400 animate-spin" />
+          </div>
+          <p className="text-sm text-[#64748B]">Loading questions...</p>
         </div>
       </div>
     )
@@ -125,6 +134,8 @@ function QuizContent({ topicId }: { topicId?: string }) {
   const isLastQuestion = currentQuestionIdx === questions.length - 1
 
   function handleAnswer(answerIndex: number) {
+    setAnimatingAnswer(answerIndex)
+    setTimeout(() => setAnimatingAnswer(null), 200)
     setSelectedAnswer(answerIndex)
   }
 
@@ -287,143 +298,205 @@ function QuizContent({ topicId }: { topicId?: string }) {
           achievement={celebrationData.achievement}
         />
 
-        <div className="mb-6">
-          <p className="text-sm font-medium text-cyan-400">{t.app.quiz.completeEyebrow}</p>
-          <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">
-            {t.app.quiz.resultsTitle(currentQuestion.curriculum as any)}
-          </h1>
-          <p className="mt-2 text-slate-400">
-            {t.app.quiz.resultsDescription(currentQuestion.curriculum as any)}
-          </p>
-        </div>
+        <div className="space-y-8">
+          {/* Results Header */}
+          <section className="relative overflow-hidden rounded-3xl border border-[#1E293B] bg-gradient-to-br from-[#0F172A] via-[#0F172A] to-cyan-500/5 p-6 sm:p-8">
+            <div className="absolute -top-24 -right-24 size-64 rounded-full bg-gradient-to-br from-cyan-500/10 to-blue-500/10 blur-3xl" />
+            <div className="relative text-center">
+              {isPerfect && (
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-amber-500/10 px-4 py-1.5 text-xs font-medium text-amber-400 ring-1 ring-amber-500/20">
+                  <Sparkles className="size-3.5" />
+                  Perfect Score! +50 XP
+                </div>
+              )}
+              <p className="text-sm font-medium text-cyan-400">{t.app.quiz.completeEyebrow}</p>
+              <h1 className="mt-2 text-3xl font-bold tracking-tight text-[#F8FAFC] sm:text-4xl">
+                {t.app.quiz.resultsTitle(currentQuestion.curriculum as any)}
+              </h1>
+              <p className="mt-2 text-[#64748B]">
+                {t.app.quiz.resultsDescription(currentQuestion.curriculum as any)}
+              </p>
+            </div>
 
-        {isPerfect && (
-          <div className="mb-6 rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-4 text-center">
-            <p className="text-2xl">🌟</p>
-            <p className="mt-1 text-sm font-semibold text-yellow-300">Perfect Score!</p>
-            <p className="text-xs text-yellow-400">+50 XP Bonus</p>
+            {/* Score Circle */}
+            <div className="mt-6 flex justify-center">
+              <div className="relative flex size-28 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-500/20 ring-2 ring-cyan-500/30">
+                <div className="text-center">
+                  <p className="text-3xl font-bold text-[#F8FAFC]">{percentage}%</p>
+                  <p className="text-xs text-[#64748B]">{score}/{questions.length}</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Result Stats */}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="rounded-2xl border border-[#1E293B] bg-[#0F172A]/80 p-4 text-center card-hover">
+              <div className="mx-auto flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 mb-2">
+                <Target className="size-5 text-cyan-400" />
+              </div>
+              <p className="text-xs text-[#64748B]">{t.app.quiz.score}</p>
+              <p className="text-xl font-bold text-[#F8FAFC]">{score}/{questions.length}</p>
+            </div>
+            <div className="rounded-2xl border border-[#1E293B] bg-[#0F172A]/80 p-4 text-center card-hover">
+              <div className="mx-auto flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 mb-2">
+                <TrendingUp className="size-5 text-emerald-400" />
+              </div>
+              <p className="text-xs text-[#64748B]">{t.app.quiz.accuracyLabel}</p>
+              <p className="text-xl font-bold text-[#F8FAFC]">{percentage}%</p>
+            </div>
+            <div className="rounded-2xl border border-[#1E293B] bg-[#0F172A]/80 p-4 text-center card-hover">
+              <div className="mx-auto flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500/20 to-purple-500/20 mb-2">
+                <Clock className="size-5 text-violet-400" />
+              </div>
+              <p className="text-xs text-[#64748B]">{t.app.quiz.time}</p>
+              <p className="text-xl font-bold text-[#F8FAFC]">{timeSpentMinutes}m</p>
+            </div>
+            <div className="rounded-2xl border border-[#1E293B] bg-[#0F172A]/80 p-4 text-center card-hover">
+              <div className="mx-auto flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 mb-2">
+                <CheckCircle2 className="size-5 text-emerald-400" />
+              </div>
+              <p className="text-xs text-[#64748B]">{t.app.quiz.status}</p>
+              <p className="text-xl font-bold text-emerald-400">{t.app.common.done}</p>
+            </div>
           </div>
-        )}
 
-        <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <ResultCard label={t.app.quiz.score} value={`${score}/${questions.length}`} icon={Target} color="text-cyan-400" />
-          <ResultCard label={t.app.quiz.accuracyLabel} value={`${percentage}%`} icon={TrendingUp} color="text-emerald-400" />
-          <ResultCard label={t.app.quiz.time} value={`${timeSpentMinutes}m`} icon={Clock} color="text-violet-400" />
-          <ResultCard label={t.app.quiz.status} value={t.app.common.done} icon={CheckCircle2} color="text-emerald-400" />
-        </div>
-
-        <section className={panelClassName}>
-          <h2 className="mb-4 text-lg font-semibold text-white">{t.app.quiz.reviewTitle}</h2>
-          <div className="space-y-4">
-            {questions.map((item, index) => {
-              const isCorrect = answers[index] === item.answer
-              return (
-                <div key={item.id} className={innerCardClassName}>
-                  <div className="flex items-start gap-3">
-                    {isCorrect ? (
-                      <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-emerald-400" />
-                    ) : (
-                      <XCircle className="mt-0.5 size-5 shrink-0 text-red-400" />
-                    )}
-                    <div className="flex-1">
-                      <p className="mb-2 text-sm font-medium text-white">
-                        {t.app.quiz.questionCount(index + 1, questions.length)}. {item.question}
-                      </p>
-                      <div className="space-y-1">
-                        {item.choices.map((option: string, optionIndex: number) => {
-                          const isSelected = answers[index] === optionIndex
-                          const isCorrectOption = optionIndex === item.answer
-                          return (
-                            <div
-                              key={option}
-                              className={`rounded border p-2 text-xs ${
-                                isCorrectOption
-                                  ? "border-emerald-500/30 bg-emerald-500/20 text-emerald-400"
-                                  : isSelected && !isCorrect
-                                    ? "border-red-500/30 bg-red-500/20 text-red-400"
-                                    : "border-transparent bg-slate-800/50 text-slate-400"
-                              }`}
-                            >
-                              {option}
-                              {isCorrectOption && ` - ${t.app.common.correct}`}
-                              {isSelected && !isCorrect && ` - ${t.app.common.yourAnswer}`}
-                            </div>
-                          )
-                        })}
+          {/* Review Questions */}
+          <section className="rounded-2xl border border-[#1E293B] bg-[#0F172A]/80 p-6 sm:p-8">
+            <h2 className="mb-6 text-lg font-semibold text-[#F8FAFC]">{t.app.quiz.reviewTitle}</h2>
+            <div className="space-y-4">
+              {questions.map((item, index) => {
+                const isCorrect = answers[index] === item.answer
+                return (
+                  <div key={item.id} className={`rounded-xl border p-5 transition-all ${
+                    isCorrect ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-red-500/20 bg-red-500/5'
+                  }`}>
+                    <div className="flex items-start gap-3">
+                      {isCorrect ? (
+                        <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-emerald-400" />
+                      ) : (
+                        <XCircle className="mt-0.5 size-5 shrink-0 text-red-400" />
+                      )}
+                      <div className="flex-1 space-y-3">
+                        <p className="text-sm font-semibold text-[#F8FAFC]">
+                          {t.app.quiz.questionCount(index + 1, questions.length)}. {item.question}
+                        </p>
+                        <div className="space-y-2">
+                          {item.choices.map((option: string, optionIndex: number) => {
+                            const isSelected = answers[index] === optionIndex
+                            const isCorrectOption = optionIndex === item.answer
+                            return (
+                              <div
+                                key={option}
+                                className={`flex items-center gap-2 rounded-xl border p-3 text-sm transition-all ${
+                                  isCorrectOption
+                                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+                                    : isSelected && !isCorrect
+                                      ? "border-red-500/30 bg-red-500/10 text-red-400"
+                                      : "border-[#1E293B] bg-[#0B1121]/60 text-[#64748B]"
+                                }`}
+                              >
+                                <span className={`flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
+                                  isCorrectOption
+                                    ? "bg-emerald-500/20 text-emerald-400"
+                                    : isSelected && !isCorrect
+                                      ? "bg-red-500/20 text-red-400"
+                                      : "bg-[#1E293B] text-[#64748B]"
+                                }`}>
+                                  {String.fromCharCode(65 + optionIndex)}
+                                </span>
+                                <span className="flex-1">{option}</span>
+                                {isCorrectOption && <CheckCircle2 className="size-4 shrink-0" />}
+                                {isSelected && !isCorrect && <XCircle className="size-4 shrink-0" />}
+                              </div>
+                            )
+                          })}
+                        </div>
+                        <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-3">
+                          <p className="text-xs text-[#64748B]">
+                            <span className="font-medium text-cyan-400">{t.app.common.explanation}:</span>{" "}
+                            <span className="text-[#CBD5E1]">{item.explanation}</span>
+                          </p>
+                        </div>
                       </div>
-                      <p className="mt-2 text-xs text-slate-400">
-                        <span className="font-medium text-cyan-400">{t.app.common.explanation}:</span>{" "}
-                        {item.explanation}
-                      </p>
                     </div>
                   </div>
-                </div>
-              )
-            })}
-          </div>
-        </section>
+                )
+              })}
+            </div>
+          </section>
 
-      <div className="mt-6 flex gap-3">
-        <button
-          type="button"
-          onClick={handleRestart}
-          className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-slate-600 p-3 text-white transition-colors hover:bg-slate-800"
-        >
-          <RotateCcw className="size-4" />
-          {t.app.quiz.retake}
-        </button>
-        <button
-          type="button"
-          onClick={handleBackToPractice}
-          className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-cyan-500 p-3 font-semibold text-white transition-colors hover:bg-cyan-400"
-        >
-          {t.app.quiz.backToPractice}
-          <ArrowRight className="size-4" />
-        </button>
-      </div>
+          {/* Actions */}
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={handleRestart}
+              className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-[#1E293B] px-5 py-3.5 text-sm font-medium text-[#F8FAFC] transition-all duration-200 hover:bg-[#1E293B] card-hover"
+            >
+              <RotateCcw className="size-4" />
+              {t.app.quiz.retake}
+            </button>
+            <button
+              type="button"
+              onClick={handleBackToPractice}
+              className="btn-primary flex flex-1 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-500 px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all duration-200 hover:shadow-xl hover:shadow-cyan-500/30"
+            >
+              {t.app.quiz.backToPractice}
+              <ArrowRight className="size-4" />
+            </button>
+          </div>
+        </div>
       </>
     )
   }
 
   return (
-    <>
-      <div className="mb-6">
-        <div className="mb-2 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-cyan-400">{currentQuestion.topicName || topicId}</p>
-            <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">
-              {t.app.quiz.questionCount(currentQuestionIdx + 1, questions.length)}
-            </h1>
+    <div className="space-y-6">
+      {/* Header with progress and hearts */}
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-cyan-400">{currentQuestion.topicName || topicId}</p>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-[#F8FAFC] sm:text-3xl">
+            {t.app.quiz.questionCount(currentQuestionIdx + 1, questions.length)}
+          </h1>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-red-500/10 px-3 py-1.5 text-sm font-medium text-red-400 ring-1 ring-red-500/20">
+            <Heart className="size-4" />
+            <span>{quizHearts}</span>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1 text-sm text-red-400">
-              <span className="text-lg">❤️</span>
-              <span className="font-semibold">{quizHearts}</span>
-            </div>
+          <div className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium ring-1 ${
+            currentQuestion.difficulty === "easy"
+              ? "bg-emerald-500/10 text-emerald-400 ring-emerald-500/20"
+              : currentQuestion.difficulty === "medium"
+                ? "bg-amber-500/10 text-amber-400 ring-amber-500/20"
+                : "bg-red-500/10 text-red-400 ring-red-500/20"
+          }`}>
+            {currentQuestion.difficulty === "easy" ? "Easy" : currentQuestion.difficulty === "medium" ? "Medium" : "Hard"}
           </div>
         </div>
-        <p className="mt-2 text-slate-400">
-          ระดับ: {currentQuestion.difficulty === "easy" ? "ง่าย" : currentQuestion.difficulty === "medium" ? "ปานกลาง" : "ยาก"}
-        </p>
       </div>
 
-      <div className="mb-6">
-        <div className="mb-2 flex justify-between text-xs text-slate-400">
+      {/* Progress Bar */}
+      <div>
+        <div className="mb-2 flex justify-between text-xs text-[#64748B]">
           <span>{t.app.quiz.progressLabel}</span>
-          <span>{Math.round((currentQuestionIdx / questions.length) * 100)}%</span>
+          <span>{currentQuestionIdx + 1} / {questions.length}</span>
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-slate-700">
+        <div className="h-2.5 overflow-hidden rounded-full bg-[#1E293B] ring-1 ring-inset ring-white/5">
           <div
-            className="h-full rounded-full bg-cyan-500 transition-all duration-300"
-            style={{ width: `${(currentQuestionIdx / questions.length) * 100}%` }}
+            className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-500 shadow-sm shadow-cyan-500/20"
+            style={{ width: `${((currentQuestionIdx + 1) / questions.length) * 100}%` }}
           />
         </div>
       </div>
 
+      {/* Hearts depletion warning */}
       {quizEnded && (
-        <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-center">
-          <p className="text-lg font-semibold text-red-300">หัวใจหมดแล้ว!</p>
-          <p className="mt-1 text-sm text-red-400">คุณสามารถเริ่มใหม่ได้เลย</p>
+        <div className="rounded-2xl border border-red-500/20 bg-gradient-to-br from-red-500/10 to-red-500/5 p-6 text-center fade-in">
+          <Heart className="mx-auto size-10 text-red-400" />
+          <p className="mt-3 text-lg font-semibold text-red-300">No hearts remaining!</p>
+          <p className="mt-1 text-sm text-red-400">You can retry the quiz.</p>
           <button
             type="button"
             onClick={() => {
@@ -433,16 +506,17 @@ function QuizContent({ topicId }: { topicId?: string }) {
               setAnswers([])
               setSelectedAnswer(null)
             }}
-            className="mt-3 rounded-lg bg-red-500 px-4 py-2 text-sm font-semibold text-white hover:bg-red-400"
+            className="btn-primary mt-4 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-red-500 to-red-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-500/20 transition-all duration-200 hover:shadow-xl hover:shadow-red-500/30"
           >
-            ลองอีกครั้ง
+            <RotateCcw className="size-4" />
+            Try Again
           </button>
         </div>
       )}
 
       {/* Hint panel */}
       {showHints && currentQuestion.hints && currentQuestion.hints.length > 0 && (
-        <div className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
+        <div className="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-500/5 p-5 fade-in">
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Lightbulb className="size-5 text-amber-400" />
@@ -456,16 +530,17 @@ function QuizContent({ topicId }: { topicId?: string }) {
               {t.app.quiz.hideHint}
             </button>
           </div>
-          <div className="rounded-lg bg-slate-900/50 p-3">
-            <p className="text-sm text-amber-200">{currentQuestion.hints[hintStep]}</p>
+          <div className="rounded-xl border border-amber-500/10 bg-[#0B1121]/60 p-4">
+            <p className="text-sm text-amber-200 leading-relaxed">{currentQuestion.hints[hintStep]}</p>
           </div>
-          <div className="mt-3 flex items-center justify-between">
+          <div className="mt-4 flex items-center justify-between">
             <button
               type="button"
               onClick={handlePrevHint}
               disabled={hintStep === 0}
-              className="rounded border border-amber-500/30 px-3 py-1 text-xs text-amber-400 transition-colors hover:bg-amber-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex items-center gap-1 rounded-lg border border-amber-500/30 px-3 py-1.5 text-xs text-amber-400 transition-all hover:bg-amber-500/20 disabled:cursor-not-allowed disabled:opacity-40"
             >
+              <ChevronLeft className="size-3" />
               {t.app.quiz.previous}
             </button>
             <span className="text-xs text-amber-400">
@@ -475,22 +550,27 @@ function QuizContent({ topicId }: { topicId?: string }) {
               type="button"
               onClick={handleNextHint}
               disabled={hintStep >= currentQuestion.hints.length - 1}
-              className="rounded border border-amber-500/30 px-3 py-1 text-xs text-amber-400 transition-colors hover:bg-amber-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex items-center gap-1 rounded-lg border border-amber-500/30 px-3 py-1.5 text-xs text-amber-400 transition-all hover:bg-amber-500/20 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {t.app.quiz.next}
+              <ChevronRight className="size-3" />
             </button>
           </div>
         </div>
       )}
 
-      <section className={panelClassName}>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">{currentQuestion.question}</h2>
+      {/* Question Card */}
+      <section className="rounded-2xl border border-[#1E293B] bg-[#0F172A]/80 p-6 sm:p-8">
+        {/* Question Header */}
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <h2 className="text-lg font-semibold text-[#F8FAFC] leading-relaxed">
+            {currentQuestion.question}
+          </h2>
           {currentQuestion.hints && currentQuestion.hints.length > 0 && !showHints && (
             <button
               type="button"
               onClick={handleToggleHints}
-              className="flex items-center gap-1.5 rounded-lg border border-amber-500/30 px-3 py-1.5 text-xs font-medium text-amber-400 transition-colors hover:bg-amber-500/20"
+              className="shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-amber-500/30 px-3.5 py-2 text-xs font-medium text-amber-400 transition-all hover:bg-amber-500/20 card-hover"
             >
               <Lightbulb className="size-3.5" />
               {t.app.quiz.showHint}
@@ -498,35 +578,37 @@ function QuizContent({ topicId }: { topicId?: string }) {
           )}
         </div>
 
+        {/* Answer Options */}
         <div className="space-y-3">
           {currentQuestion.choices.map((option: string, index: number) => (
             <button
               key={option}
               type="button"
               onClick={() => handleAnswer(index)}
-              className={`w-full rounded-xl border p-4 text-left transition-all ${
+              className={`group w-full rounded-2xl border p-4 text-left transition-all duration-200 ${
                 selectedAnswer === index
-                  ? "border-cyan-500 bg-cyan-500/10 text-white"
-                  : "border-slate-700 bg-slate-800 text-slate-300 hover:border-slate-600 hover:bg-slate-800/80"
-              }`}
+                  ? "border-cyan-500/50 bg-gradient-to-r from-cyan-500/15 to-blue-500/10 text-[#F8FAFC] shadow-lg shadow-cyan-500/10"
+                  : "border-[#1E293B] bg-[#0B1121]/60 text-[#CBD5E1] hover:border-[#334155] hover:bg-[#0F172A]/80 hover:shadow-md"
+              } ${animatingAnswer === index ? 'scale-[1.02]' : 'scale-100'}`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <div
-                  className={`flex size-6 items-center justify-center rounded-full border-2 text-xs font-medium ${
+                  className={`flex size-8 shrink-0 items-center justify-center rounded-xl text-sm font-bold transition-all ${
                     selectedAnswer === index
-                      ? "border-cyan-500 bg-cyan-500 text-white"
-                      : "border-slate-600 text-slate-400"
+                      ? "bg-gradient-to-br from-cyan-500 to-blue-500 text-white shadow-md"
+                      : "bg-[#1E293B] text-[#64748B] group-hover:bg-[#334155] group-hover:text-[#CBD5E1]"
                   }`}
                 >
                   {String.fromCharCode(65 + index)}
                 </div>
-                <span className="text-sm">{option}</span>
+                <span className="text-sm font-medium">{option}</span>
               </div>
             </button>
           ))}
         </div>
 
-        <div className="mt-6 flex items-center justify-between">
+        {/* Navigation */}
+        <div className="mt-8 flex items-center justify-between gap-3">
           <button
             type="button"
             onClick={() => {
@@ -536,43 +618,31 @@ function QuizContent({ topicId }: { topicId?: string }) {
               }
             }}
             disabled={currentQuestionIdx === 0}
-            className="rounded-lg border border-slate-600 px-4 py-2 text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-xl border border-[#1E293B] px-4 py-2.5 text-sm font-medium text-[#64748B] transition-all duration-200 hover:border-[#334155] hover:text-[#F8FAFC] disabled:cursor-not-allowed disabled:opacity-40 card-hover"
           >
+            <ChevronLeft className="size-4" />
             {t.app.quiz.previous}
           </button>
           <button
             type="button"
             onClick={handleNext}
             disabled={selectedAnswer === null}
-            className="flex items-center gap-2 rounded-lg bg-cyan-500 px-6 py-2 font-semibold text-white transition-colors hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+            className="btn-primary flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all duration-200 hover:shadow-xl hover:shadow-cyan-500/30 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isLastQuestion ? t.app.quiz.submit : t.app.quiz.next}
-            <ArrowRight className="size-4" />
+            {isLastQuestion ? (
+              <>
+                <Trophy className="size-4" />
+                {t.app.quiz.submit}
+              </>
+            ) : (
+              <>
+                {t.app.quiz.next}
+                <ChevronRight className="size-4" />
+              </>
+            )}
           </button>
         </div>
       </section>
-    </>
-  )
-}
-
-function ResultCard({
-  label,
-  value,
-  icon: Icon,
-  color,
-}: {
-  label: string
-  value: string
-  icon: LucideIcon
-  color: string
-}) {
-  return (
-    <div className={innerCardClassName}>
-      <div className="mb-2 flex items-center justify-between">
-        <span className="text-xs text-slate-400">{label}</span>
-        <Icon className={`size-4 ${color}`} />
-      </div>
-      <p className="text-2xl font-bold text-white">{value}</p>
     </div>
   )
 }

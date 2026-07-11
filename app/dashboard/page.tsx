@@ -13,6 +13,13 @@ import {
   BookMarked,
   Heart,
   Zap,
+  ChevronRight,
+  Brain,
+  ArrowRight,
+  Star,
+  GraduationCap,
+  Timer,
+  Trophy,
 } from "lucide-react"
 import { AuthGuard } from "@/components/auth-guard"
 import { DashboardShell } from "@/components/dashboard-shell"
@@ -52,31 +59,115 @@ export default function DashboardPage() {
   )
 }
 
-function RecommendationCard({
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  color,
+  accent,
+}: {
+  icon: React.ElementType
+  label: string
+  value: string | number
+  color: string
+  accent: string
+}) {
+  return (
+    <div className="group relative overflow-hidden rounded-2xl border border-[#1E293B] bg-[#0F172A]/80 p-4 transition-all duration-300 hover:border-[#334155] hover:shadow-lg hover:shadow-black/20 card-hover">
+      <div className={`absolute inset-0 bg-gradient-to-br ${accent} opacity-0 transition-opacity duration-300 group-hover:opacity-5`} />
+      <div className="relative flex items-start justify-between">
+        <div>
+          <p className="text-xs font-medium text-[#64748B]">{label}</p>
+          <p className="mt-1.5 text-2xl font-bold tracking-tight text-[#F8FAFC]">{value}</p>
+        </div>
+        <div className={`flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${color} shadow-lg`}>
+          <Icon className="size-5 text-white" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function QuickActionCard({
   title,
   description,
   href,
-  icon,
-  color,
+  icon: Icon,
+  gradient,
+  badge,
 }: {
   title: string
   description: string
   href: string
-  icon: string
-  color: string
+  icon: React.ElementType
+  gradient: string
+  badge?: string
 }) {
-  const colorClasses = {
-    cyan: "border-cyan-500/30 bg-cyan-500/5 hover:bg-cyan-500/10",
-    emerald: "border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10",
-    violet: "border-violet-500/30 bg-violet-500/5 hover:bg-violet-500/10",
-  }
-
   return (
-    <Link href={href} className={`rounded-xl border p-4 transition-all ${colorClasses[color as keyof typeof colorClasses] || colorClasses.cyan}`}>
-      <div className="mb-2 text-2xl">{icon}</div>
-      <h3 className="text-sm font-semibold text-white">{title}</h3>
-      <p className="mt-1 text-xs text-slate-400">{description}</p>
+    <Link
+      href={href}
+      className="group relative overflow-hidden rounded-2xl border border-[#1E293B] bg-[#0F172A]/80 p-5 transition-all duration-300 hover:border-[#334155] hover:shadow-lg hover:shadow-black/20 card-hover"
+    >
+      <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 transition-opacity duration-300 group-hover:opacity-5`} />
+      <div className="relative">
+        <div className="flex items-start justify-between mb-3">
+          <div className={`flex size-12 items-center justify-center rounded-xl bg-gradient-to-br ${gradient} shadow-lg`}>
+            <Icon className="size-6 text-white" />
+          </div>
+          {badge && (
+            <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-[10px] font-medium text-emerald-400 ring-1 ring-emerald-500/20">
+              {badge}
+            </span>
+          )}
+        </div>
+        <h3 className="text-base font-semibold text-[#F8FAFC] group-hover:text-cyan-400 transition-colors">{title}</h3>
+        <p className="mt-1 text-sm text-[#64748B]">{description}</p>
+        <div className="mt-4 flex items-center gap-1 text-xs font-medium text-cyan-400 opacity-0 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-1">
+          <span>Go now</span>
+          <ArrowRight className="size-3.5" />
+        </div>
+      </div>
     </Link>
+  )
+}
+
+function ActivityCard({
+  activity,
+  t,
+}: {
+  activity: { id: string; title: string; status: string; questions: number; date: string; score?: number; completed: number }
+  t: any
+}) {
+  return (
+    <div className="group rounded-2xl border border-[#1E293B] bg-[#0F172A]/60 p-4 transition-all duration-200 hover:border-[#334155] hover:bg-[#0F172A] card-hover">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-[#F8FAFC] truncate">{activity.title}</h3>
+            {activity.status === "completed" ? (
+              <CheckCircle2 className="size-4 shrink-0 text-emerald-400" />
+            ) : (
+              <span className="shrink-0 rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-400 ring-1 ring-amber-500/20">
+                {t.app.dashboardPage.activeLabel}
+              </span>
+            )}
+          </div>
+          <p className="mt-1 text-xs text-[#64748B]">
+            {activity.questions} {t.app.common.questions} · {activity.date}
+          </p>
+        </div>
+        {activity.status === "completed" && activity.score !== undefined ? (
+          <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10">
+            <span className="text-lg font-bold text-emerald-400">{activity.score}%</span>
+          </div>
+        ) : (
+          <div className="text-right shrink-0">
+            <p className="text-xs text-[#64748B]">{activity.completed}/{activity.questions}</p>
+            <p className="text-[10px] text-[#64748B]">{t.app.common.completed}</p>
+          </div>
+        )}
+      </div>
+    </div>
   )
 }
 
@@ -106,9 +197,110 @@ function DashboardContent() {
   const recommendedLessonId = studyingLessonId || lastCompletedLessonId || currentTopics[0]?.id
 
   return (
-    <>
-      {/* AI Study Coach Section */}
-      <section className="mb-6 grid gap-6 lg:grid-cols-3">
+    <div className="space-y-8">
+      {/* ===== WELCOME SECTION ===== */}
+      <section className="relative overflow-hidden rounded-3xl border border-[#1E293B] bg-gradient-to-br from-[#0F172A] via-[#0F172A] to-cyan-500/5 p-6 sm:p-8">
+        {/* Background decoration */}
+        <div className="absolute -top-24 -right-24 size-64 rounded-full bg-gradient-to-br from-cyan-500/10 to-blue-500/10 blur-3xl" />
+        <div className="absolute -bottom-16 -left-16 size-48 rounded-full bg-gradient-to-br from-violet-500/5 to-cyan-500/5 blur-3xl" />
+
+        <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-400 ring-1 ring-cyan-500/20">
+                <Sparkles className="size-3" />
+                {t.app.dashboardPage.eyebrow}
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400 ring-1 ring-emerald-500/20">
+                <TrendingUp className="size-3" />
+                {stats.streak} day streak
+              </span>
+            </div>
+            <h1 className="mt-3 text-3xl font-bold tracking-tight text-[#F8FAFC] sm:text-4xl">
+              {t.app.dashboardPage.welcome(user.fullName.split(" ")[0])}
+            </h1>
+            <p className="mt-2 max-w-xl text-base text-[#64748B] leading-relaxed">
+              {curriculumLabel} · {onboarding.learningGoal}
+            </p>
+          </div>
+
+          <div className="flex gap-3">
+            {recommendedLessonId && (
+              <Link
+                href={`/lesson/${recommendedLessonId}`}
+                className="btn-primary inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all duration-200 hover:shadow-xl hover:shadow-cyan-500/30 hover:scale-[1.02]"
+              >
+                <BookOpen className="size-4" />
+                Continue Learning
+                <ChevronRight className="size-4" />
+              </Link>
+            )}
+          </div>
+        </div>
+
+        {/* Level & XP Bar */}
+        <div className="relative mt-6 rounded-2xl border border-[#1E293B] bg-[#0B1121]/60 p-4 sm:p-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 shadow-lg shadow-cyan-500/20">
+                <Zap className="size-6 text-white" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-[#64748B]">Level</span>
+                  <span className="text-2xl font-bold text-[#F8FAFC]">{level}</span>
+                </div>
+                <p className="text-sm font-semibold text-cyan-400">{xp.toLocaleString()} XP</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2 text-[#F59E0B]">
+                <Flame className="size-5" />
+                <span className="text-base font-bold">{streak}</span>
+                <span className="text-sm text-[#64748B]">days</span>
+              </div>
+              <div className="flex items-center gap-2 text-[#EF4444]">
+                <Heart className="size-5" />
+                <span className="text-base font-bold">{hearts}</span>
+                <span className="text-sm text-[#64748B]">/5</span>
+              </div>
+              <div className="flex items-center gap-2 text-[#22C55E]">
+                <Trophy className="size-5" />
+                <span className="text-sm font-semibold text-[#F8FAFC]">{completedTopics}/{currentTopics.length}</span>
+                <span className="text-sm text-[#64748B]">topics</span>
+              </div>
+            </div>
+          </div>
+          {levelProgress && (
+            <div className="mt-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-[#64748B]">Next level</span>
+                <span className="text-xs text-[#64748B]">{levelProgress.current.toLocaleString()} / {levelProgress.next.toLocaleString()} XP</span>
+              </div>
+              <div className="h-2.5 overflow-hidden rounded-full bg-[#1E293B] ring-1 ring-inset ring-white/5">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-500 shadow-sm shadow-cyan-500/20"
+                  style={{ width: `${levelProgress.progress}%` }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ===== STATISTICS CARDS ===== */}
+      <section>
+        <h2 className="mb-4 text-lg font-semibold text-[#F8FAFC]">Today's Progress</h2>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <StatCard icon={Target} label={t.app.dashboardPage.overallProgress} value={`${stats.overallProgress}%`} color="from-cyan-500 to-blue-500" accent="from-cyan-500 to-blue-500" />
+          <StatCard icon={Timer} label={t.app.dashboardPage.studyTimeLabel} value={formatStudyTime(stats.studyTimeMinutes)} color="from-violet-500 to-purple-500" accent="from-violet-500 to-purple-500" />
+          <StatCard icon={GraduationCap} label={t.app.dashboardPage.questionsDoneLabel} value={stats.questionsDone} color="from-emerald-500 to-teal-500" accent="from-emerald-500 to-teal-500" />
+          <StatCard icon={Star} label={t.app.dashboardPage.accuracyLabel} value={`${stats.accuracy}%`} color="from-amber-500 to-orange-500" accent="from-amber-500 to-orange-500" />
+        </div>
+      </section>
+
+      {/* ===== AI STUDY COACH SECTION ===== */}
+      <section className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <AICoachCard />
         </div>
@@ -118,13 +310,14 @@ function DashboardContent() {
         </div>
       </section>
 
-      <section className="mb-6 grid gap-6 lg:grid-cols-2">
+      {/* ===== WEAK/STRONG TOPICS ===== */}
+      <section className="grid gap-6 lg:grid-cols-2">
         <WeakTopicsCard />
         <StrongTopicsCard />
       </section>
 
-      {/* Learning Intelligence Section */}
-      <section className="mb-6 grid gap-6 lg:grid-cols-3">
+      {/* ===== LEARNING INTELLIGENCE ===== */}
+      <section className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <SkillCard />
         </div>
@@ -134,189 +327,62 @@ function DashboardContent() {
         </div>
       </section>
 
-      <section className="mb-6">
+      <section>
         <ReviewCard />
       </section>
 
-      {/* Gamification Header */}
-      <section className={`mb-6 ${panelClassName} sm:p-8`}>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-medium text-cyan-400">{t.app.dashboardPage.eyebrow}</p>
-            <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">
-              {t.app.dashboardPage.welcome(user.fullName.split(" ")[0])}
-            </h1>
-            <p className="mt-2 max-w-xl text-slate-400">
-              หลักสูตร: {curriculumLabel} · {onboarding.learningGoal}
-            </p>
-          </div>
-
-          {recommendedLessonId && (
-            <Link
-              href={`/lesson/${recommendedLessonId}`}
-              className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-cyan-400"
-            >
-              <BookOpen className="size-4" />
-              เรียนต่อ
-            </Link>
-          )}
-        </div>
-
-        {/* Level & XP */}
-        <div className={`mt-4 ${innerCardClassName}`}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-400">
-                <Zap className="size-5" />
-              </div>
-              <div>
-                <p className="text-xs text-slate-400">Level {level}</p>
-                <p className="text-sm font-semibold text-white">{xp} XP</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1 text-orange-400">
-                <Flame className="size-4" />
-                <span className="text-sm font-semibold">{streak} วัน</span>
-              </div>
-              <div className="flex items-center gap-1 text-red-400">
-                <Heart className="size-4" />
-                <span className="text-sm font-semibold">{hearts}/5</span>
-              </div>
-            </div>
-          </div>
-          {levelProgress && (
-            <div className="mt-3">
-              <div className="h-2 overflow-hidden rounded-full bg-slate-700">
-                <div
-                  className="h-full rounded-full bg-cyan-500 transition-all duration-300"
-                  style={{ width: `${levelProgress.progress}%` }}
-                />
-              </div>
-              <p className="mt-1 text-xs text-slate-400">
-                {levelProgress.current} / {levelProgress.next} XP ถึง Level {level + 1}
-              </p>
-            </div>
-          )}
+      {/* ===== QUICK ACTIONS ===== */}
+      <section>
+        <h2 className="mb-4 text-lg font-semibold text-[#F8FAFC]">Quick Actions</h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <QuickActionCard
+            title="Continue Learning"
+            description={recommendedLessonId ? "Pick up where you left off" : "Start your first lesson"}
+            href={`/lesson/${recommendedLessonId || currentTopics[0]?.id}`}
+            icon={BookOpen}
+            gradient="from-cyan-500 to-blue-500"
+            badge="Continue"
+          />
+          <QuickActionCard
+            title="Practice Quiz"
+            description="Test your knowledge with a quiz"
+            href="/practice"
+            icon={GraduationCap}
+            gradient="from-emerald-500 to-teal-500"
+          />
+          <QuickActionCard
+            title="AI Tutor"
+            description="Ask AI anything about math"
+            href="/dashboard/ai"
+            icon={Brain}
+            gradient="from-violet-500 to-purple-500"
+          />
         </div>
       </section>
 
-      {/* Stats Cards */}
-      <section className={panelClassName}>
-        <div className="flex flex-wrap gap-3">
-          <div className={`flex items-center gap-2 ${innerCardClassName}`}>
-            <BookMarked className="size-5 text-cyan-400" />
-            <div>
-              <p className="text-xs text-slate-400">หลักสูตรที่กำลังเรียน</p>
-              <p className="text-sm font-semibold text-white">{curriculumLabel}</p>
-            </div>
-          </div>
-          <div className={`flex items-center gap-2 ${innerCardClassName}`}>
-            <CheckCircle2 className="size-5 text-emerald-400" />
-            <div>
-              <p className="text-xs text-slate-400">หัวข้อที่เรียนแล้ว</p>
-              <p className="text-sm font-semibold text-white">{completedTopics} / {currentTopics.length}</p>
-            </div>
-          </div>
-          <div className={`flex items-center gap-2 ${innerCardClassName}`}>
-            <Flame className="size-5 text-orange-400" />
-            <div>
-              <p className="text-xs text-slate-400">{t.app.dashboardPage.streakLabel}</p>
-              <p className="text-sm font-semibold text-white">{stats.streak} {t.app.common.days}</p>
-            </div>
-          </div>
-          <div className={`flex items-center gap-2 ${innerCardClassName}`}>
-            <Target className="size-5 text-cyan-400" />
-            <div>
-              <p className="text-xs text-slate-400">{t.app.dashboardPage.accuracyLabel}</p>
-              <p className="text-sm font-semibold text-white">{stats.accuracy}%</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-5 flex flex-wrap gap-2">
-          {onboarding.subjects.map((subject) => (
-            <span
-              key={subject}
-              className="rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-400"
-            >
-              {subject}
-            </span>
-          ))}
-        </div>
-      </section>
-
-      {/* Section 3: Analytics Charts */}
-      <section className={`mt-6 ${panelClassName}`}>
+      {/* ===== ANALYTICS CHARTS ===== */}
+      <section className="rounded-2xl border border-[#1E293B] bg-[#0F172A]/80 p-5 sm:p-6">
         <DashboardCharts user={user} />
       </section>
 
-      {/* Section 4: Recommendations */}
-      <section className={`mt-6 ${panelClassName}`}>
-        <h2 className="mb-4 text-lg font-semibold text-white">คำแนะนำสำหรับคุณ</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <RecommendationCard
-            title="เรียนต่อ"
-            description={recommendedLessonId ? `บทเรียนที่กำลังเรียน` : "เริ่มเรียนบทเรียนแรก"}
-            href={`/lesson/${recommendedLessonId || currentTopics[0]?.id}`}
-            icon="📖"
-            color="cyan"
-          />
-          <RecommendationCard
-            title="ทำโจทย์"
-            description="ฝึกฝนด้วยแบบทดสอบ"
-            href="/practice"
-            icon="✍️"
-            color="emerald"
-          />
-          <RecommendationCard
-            title="ดูหลักสูตร"
-            description="เลือกหัวข้อที่สนใจ"
-            href="/curriculum"
-            icon="📚"
-            color="violet"
-          />
-        </div>
-      </section>
-
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
-        <section className={`lg:col-span-2 ${panelClassName}`}>
+      {/* ===== SUBJECT MASTERY & OVERVIEW ===== */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        <section className="lg:col-span-2 rounded-2xl border border-[#1E293B] bg-[#0F172A]/80 p-5 sm:p-6">
           <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-white">{t.app.dashboardPage.learningProgress}</h2>
-              <p className="text-sm text-slate-400">{t.app.dashboardPage.performanceLast7Days}</p>
+              <h2 className="text-lg font-semibold text-[#F8FAFC]">{t.app.dashboardPage.learningProgress}</h2>
+              <p className="text-sm text-[#64748B]">{t.app.dashboardPage.performanceLast7Days}</p>
             </div>
-            <span className="inline-flex w-fit items-center gap-1 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
+            <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-400 ring-1 ring-emerald-500/20">
               <TrendingUp className="size-3.5" />
               {t.app.dashboardPage.gettingStarted}
             </span>
           </div>
 
-          <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-            <div className={innerCardClassName}>
-              <p className="text-xs text-slate-400">{t.app.dashboardPage.overallProgress}</p>
-              <p className="mt-1 text-2xl font-bold text-white">{stats.overallProgress}%</p>
-            </div>
-            <div className={innerCardClassName}>
-              <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                <Clock className="size-3.5" />
-                {t.app.dashboardPage.studyTimeLabel}
-              </div>
-              <p className="mt-1 text-2xl font-bold text-white">{formatStudyTime(stats.studyTimeMinutes)}</p>
-            </div>
-            <div className={`col-span-2 sm:col-span-1 ${innerCardClassName}`}>
-              <p className="text-xs text-slate-400">{t.app.dashboardPage.questionsDoneLabel}</p>
-              <p className="mt-1 text-2xl font-bold text-white">{stats.questionsDone}</p>
-            </div>
-            <div className={innerCardClassName}>
-              <p className="text-xs text-slate-400">คะแนนเฉลี่ยหัวข้อ</p>
-              <p className="mt-1 text-2xl font-bold text-white">{avgTopicScore}%</p>
-            </div>
-          </div>
-
-          <div className={`mb-6 ${innerCardClassName}`}>
+          {/* Progress Chart */}
+          <div className="mb-6 rounded-xl border border-[#1E293B] bg-[#0B1121]/60 p-4">
             <div className="relative">
-              <svg viewBox={`0 0 ${chartW} ${chartH}`} className="h-28 w-full sm:h-32" preserveAspectRatio="none">
+              <svg viewBox={`0 0 ${chartW} ${chartH}`} className="h-32 w-full" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id="progressFill" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.35" />
@@ -327,26 +393,30 @@ function DashboardContent() {
                 <path d={linePath} fill="none" stroke="#06b6d4" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
               </svg>
             </div>
-            <div className="mt-2 flex justify-between text-xs text-slate-500">
+            <div className="mt-2 flex justify-between text-xs text-[#64748B]">
               {DAYS.map((day) => (
                 <span key={day}>{day}</span>
               ))}
             </div>
           </div>
 
+          {/* Subject Mastery */}
           <div>
-            <h3 className="mb-3 text-sm font-medium text-slate-300">{t.app.dashboardPage.subjectMastery}</h3>
-            <div className="space-y-3">
+            <h3 className="mb-4 text-sm font-semibold text-[#CBD5E1]">{t.app.dashboardPage.subjectMastery}</h3>
+            <div className="space-y-4">
               {onboarding.subjects.map((subject) => {
                 const value = stats.subjectProgress[subject] ?? 0
                 return (
                   <div key={subject}>
-                    <div className="mb-1 flex justify-between text-sm">
-                      <span className="text-slate-300">{subject}</span>
-                      <span className="font-medium text-white">{value}%</span>
+                    <div className="mb-1.5 flex justify-between text-sm">
+                      <span className="font-medium text-[#CBD5E1]">{subject}</span>
+                      <span className="font-semibold text-[#F8FAFC]">{value}%</span>
                     </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-slate-700">
-                      <div className={`h-full rounded-full ${getSubjectColor(subject)}`} style={{ width: `${value}%` }} />
+                    <div className="h-2.5 overflow-hidden rounded-full bg-[#1E293B] ring-1 ring-inset ring-white/5">
+                      <div
+                        className={`h-full rounded-full transition-all duration-500 ${getSubjectColor(subject)}`}
+                        style={{ width: `${value}%` }}
+                      />
                     </div>
                   </div>
                 )
@@ -355,94 +425,89 @@ function DashboardContent() {
           </div>
         </section>
 
-        <section className={panelClassName}>
-          <h2 className="text-lg font-semibold text-white">{t.app.dashboardPage.quickOverview}</h2>
-          <p className="mt-1 text-sm text-slate-400">{t.app.dashboardPage.learningProfile}</p>
+        {/* Learning Profile */}
+        <section className="rounded-2xl border border-[#1E293B] bg-[#0F172A]/80 p-5 sm:p-6">
+          <h2 className="text-lg font-semibold text-[#F8FAFC]">{t.app.dashboardPage.quickOverview}</h2>
+          <p className="mt-1 text-sm text-[#64748B]">{t.app.dashboardPage.learningProfile}</p>
 
           <div className="mt-5 space-y-3">
-            <div className={innerCardClassName}>
+            <div className="rounded-xl border border-[#1E293B] bg-[#0B1121]/60 p-4 transition-all hover:border-[#334155] card-hover">
               <div className="flex items-start gap-3">
                 <Sparkles className="mt-0.5 size-5 text-cyan-400" />
                 <div>
-                  <p className="text-sm font-medium text-white">{t.app.dashboardPage.focusSubjects}</p>
-                  <p className="mt-1 text-xs text-slate-400">{onboarding.learningGoal}</p>
+                  <p className="text-sm font-semibold text-[#F8FAFC]">{t.app.dashboardPage.focusSubjects}</p>
+                  <p className="mt-1 text-xs text-[#64748B]">{onboarding.learningGoal}</p>
                 </div>
               </div>
             </div>
-            <div className={innerCardClassName}>
+            <div className="rounded-xl border border-[#1E293B] bg-[#0B1121]/60 p-4 transition-all hover:border-[#334155] card-hover">
               <div className="flex items-start gap-3">
                 <BookMarked className="mt-0.5 size-5 text-cyan-400" />
                 <div>
-                  <p className="text-sm font-medium text-white">หลักสูตรที่กำลังเรียน</p>
-                  <p className="mt-1 text-xs text-slate-400">{curriculumLabel}</p>
+                  <p className="text-sm font-semibold text-[#F8FAFC]">Current Curriculum</p>
+                  <p className="mt-1 text-xs text-[#64748B]">{curriculumLabel}</p>
                 </div>
               </div>
             </div>
-            <div className={innerCardClassName}>
+            <div className="rounded-xl border border-[#1E293B] bg-[#0B1121]/60 p-4 transition-all hover:border-[#334155] card-hover">
               <div className="flex items-start gap-3">
                 <BookOpen className="mt-0.5 size-5 text-cyan-400" />
                 <div>
-                  <p className="text-sm font-medium text-white">{t.app.dashboardPage.focusSubjects}</p>
-                  <p className="mt-1 text-xs text-slate-400">{onboarding.subjects.join(", ")}</p>
+                  <p className="text-sm font-semibold text-[#F8FAFC]">{t.app.dashboardPage.focusSubjects}</p>
+                  <p className="mt-1 text-xs text-[#64748B]">{onboarding.subjects.join(", ")}</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <Link href="/practice" className="mt-5 block w-full rounded-lg bg-cyan-500 p-3 text-center text-sm font-semibold text-white transition-colors hover:bg-cyan-400">
+          <Link
+            href="/practice"
+            className="btn-primary mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 p-3.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all duration-200 hover:shadow-xl hover:shadow-cyan-500/30"
+          >
             {t.app.dashboardPage.startPractice}
+            <ArrowRight className="size-4" />
           </Link>
         </section>
       </div>
 
-      <section className={`mt-6 sm:mt-8 ${panelClassName}`}>
+      {/* ===== RECENT ACTIVITIES ===== */}
+      <section className="rounded-2xl border border-[#1E293B] bg-[#0F172A]/80 p-5 sm:p-6">
         <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-white">{t.app.dashboardPage.recentActivities}</h2>
-            <p className="text-sm text-slate-400">{t.app.dashboardPage.latestPracticeSessions}</p>
+            <h2 className="text-lg font-semibold text-[#F8FAFC]">{t.app.dashboardPage.recentActivities}</h2>
+            <p className="text-sm text-[#64748B]">{t.app.dashboardPage.latestPracticeSessions}</p>
           </div>
-          <Link href="/progress" className="inline-flex items-center gap-1 text-sm font-medium text-cyan-400 hover:text-cyan-300">
+          <Link
+            href="/progress"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-cyan-400 transition-colors hover:text-cyan-300"
+          >
             {t.app.dashboardPage.viewProgress}
             <BarChart3 className="size-4" />
           </Link>
         </div>
 
         {activities.length === 0 ? (
-          <div className={`text-center ${innerCardClassName}`}>
-            <p className="text-sm text-slate-400">{t.app.dashboardPage.noActivities}</p>
-            <Link href="/practice" className="mt-3 inline-block text-sm font-medium text-cyan-400 hover:text-cyan-300">
+          <div className="rounded-xl border border-[#1E293B] bg-[#0B1121]/60 p-8 text-center">
+            <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-cyan-500/10 mb-4">
+              <BookOpen className="size-8 text-cyan-400" />
+            </div>
+            <p className="text-sm text-[#64748B]">{t.app.dashboardPage.noActivities}</p>
+            <Link
+              href="/practice"
+              className="mt-4 inline-flex items-center gap-2 rounded-xl bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-400 transition-colors hover:bg-cyan-500/20"
+            >
               {t.app.dashboardPage.goToPractice}
+              <ArrowRight className="size-3.5" />
             </Link>
           </div>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {activities.map((activity) => (
-              <article key={activity.id} className={innerCardClassName}>
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="text-sm font-medium text-white">{activity.title}</h3>
-                  {activity.status === "completed" ? (
-                    <CheckCircle2 className="size-4 shrink-0 text-emerald-400" />
-                  ) : (
-                    <span className="shrink-0 rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-400">
-                      {t.app.dashboardPage.activeLabel}
-                    </span>
-                  )}
-                </div>
-                <p className="mt-1 text-xs text-slate-400">
-                  {activity.questions} {t.app.common.questions} · {activity.date}
-                </p>
-                {activity.status === "completed" && activity.score !== undefined ? (
-                  <p className="mt-3 text-2xl font-bold text-white">{activity.score}%</p>
-                ) : (
-                  <p className="mt-3 text-xs text-slate-400">
-                    {activity.completed} {t.app.common.of} {activity.questions} {t.app.common.completed}
-                  </p>
-                )}
-              </article>
+              <ActivityCard key={activity.id} activity={activity} t={t} />
             ))}
           </div>
         )}
       </section>
-    </>
+    </div>
   )
 }

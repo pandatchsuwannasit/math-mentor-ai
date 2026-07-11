@@ -38,7 +38,7 @@ export function SiteHeader() {
             <a
               key={link.href}
               href={link.href}
-              className={`relative text-sm font-medium transition-colors hover:text-foreground ${
+              className={`relative text-sm font-medium transition-colors duration-300 ease-out hover:text-foreground ${
                 i === 0 ? "text-foreground" : "text-muted-foreground"
               }`}
             >
@@ -55,7 +55,7 @@ export function SiteHeader() {
           <LanguageSwitcher />
           <button
             aria-label={t.nav.toggleTheme}
-            className="flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+            className="flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors duration-300 ease-out hover:bg-secondary hover:text-foreground"
           >
             <Moon className="size-5" />
           </button>

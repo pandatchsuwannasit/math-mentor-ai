@@ -26,7 +26,7 @@ export function Hero() {
 
       <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:gap-8 lg:px-8">
         {/* Left column */}
-        <div>
+        <div className="fade-in-up">
           <span className="inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-4 py-1.5 text-sm font-medium text-brand">
             <Sparkles className="size-4" />
             {t.hero.badge}
@@ -91,7 +91,7 @@ export function Hero() {
         </div>
 
         {/* Right column - dashboard */}
-        <div className="lg:pl-4">
+        <div className="lg:pl-4 fade-in-up">
           <DashboardPreview />
         </div>
       </div>

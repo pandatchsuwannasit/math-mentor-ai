@@ -50,7 +50,7 @@ export function Features() {
           {FEATURES.map((feature) => (
             <article
               key={feature.title}
-              className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+              className="rounded-2xl border border-black/5 bg-white p-5 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-md"
             >
               <span className={`mb-4 flex size-12 items-center justify-center rounded-xl ${feature.tint}`}>
                 <feature.icon className="size-6" />

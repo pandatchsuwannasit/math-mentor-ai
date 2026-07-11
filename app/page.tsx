@@ -4,7 +4,7 @@ import { Features } from "@/components/features"
 
 export default function Page() {
   return (
-    <main className="relative min-h-screen bg-navy-deep">
+    <main className="relative min-h-screen bg-navy-deep page-enter">
       <SiteHeader />
       <Hero />
       <Features />
