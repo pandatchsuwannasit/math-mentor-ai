@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai"
+import { GoogleGenerativeAI } from "@google/generative-ai"
 import type { AIMode } from "@/types/ai"
 import { buildSystemPrompt, buildTutorPrompt, buildSummaryPrompt, buildQuizPrompt, buildCoachPrompt } from "./prompts"
 
