@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { MathBackground } from "@/components/math-background"
 import { DashboardPreview } from "@/components/dashboard-preview"
 import { useLanguage } from "@/components/language-provider"
+import Link from "next/link"
 
 const AVATARS = [
   "/avatars/student-1.png",
@@ -46,13 +47,15 @@ export function Hero() {
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button
-              size="lg"
-              className="h-12 rounded-xl bg-brand-blue px-6 text-base text-primary-foreground hover:bg-brand-blue/90"
-            >
-              {t.hero.startLearning}
-              <ArrowRight className="size-5" />
-            </Button>
+            <Link href="/login">
+              <Button
+                size="lg"
+                className="h-12 rounded-xl bg-brand-blue px-6 text-base text-primary-foreground hover:bg-brand-blue/90"
+              >
+                {t.hero.startLearning}
+                <ArrowRight className="size-5" />
+              </Button>
+            </Link>
             <Button
               size="lg"
               variant="outline"
