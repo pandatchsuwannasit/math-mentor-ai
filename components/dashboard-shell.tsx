@@ -131,6 +131,7 @@ function NavContent({
     { href: "/progress", label: t.app.shell.nav.progress, icon: TrendingUp },
     { href: "/profile", label: t.app.shell.nav.profile, icon: User },
     { href: "/settings", label: t.app.shell.nav.settings, icon: Settings },
+    { href: "/dashboard/ai", label: "🤖 AI Tutor", icon: Brain },
   ]
 
   return (
