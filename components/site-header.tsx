@@ -21,10 +21,10 @@ export function SiteHeader() {
 
   return (
     <header className="absolute inset-x-0 top-0 z-50">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between rounded-full border border-white/10 bg-slate-950/50 px-4 py-3 shadow-[0_10px_40px_rgba(2,8,23,0.32)] backdrop-blur-xl sm:px-6 lg:mt-4 lg:px-8">
         {/* Logo */}
         <a href="#home" className="flex items-center gap-2">
-          <span className="flex size-8 items-center justify-center rounded-lg bg-brand/15 text-brand">
+          <span className="flex size-8 items-center justify-center rounded-xl bg-brand/15 text-brand">
             <Brain className="size-5" />
           </span>
           <span className="text-lg font-semibold tracking-tight">
@@ -39,7 +39,7 @@ export function SiteHeader() {
               key={link.href}
               href={link.href}
               className={`relative text-sm font-medium transition-colors duration-300 ease-out hover:text-foreground ${
-                i === 0 ? "text-foreground" : "text-muted-foreground"
+                i === 0 ? "text-white" : "text-slate-400"
               }`}
             >
               {link.label}
@@ -55,21 +55,21 @@ export function SiteHeader() {
           <LanguageSwitcher />
           <button
             aria-label={t.nav.toggleTheme}
-            className="flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors duration-300 ease-out hover:bg-secondary hover:text-foreground"
+            className="flex size-9 items-center justify-center rounded-full text-slate-400 transition-colors duration-300 ease-out hover:bg-white/10 hover:text-white"
           >
             <Moon className="size-5" />
           </button>
           <Link href="/login">
           <Button         
             variant="outline"
-            className="rounded-lg border-border bg-transparent text-foreground hover:bg-secondary"
+            className="rounded-xl border-white/10 bg-white/5 text-white hover:bg-white/10"
           >
             {t.nav.login}
           </Button>             
         </Link>
          
           <Link href="/register">
-            <Button className="rounded-lg bg-brand-blue text-primary-foreground hover:bg-brand-blue/90">
+            <Button className="rounded-xl bg-gradient-to-r from-brand to-brand-blue text-primary-foreground shadow-lg shadow-brand/20 hover:opacity-95">
               {t.nav.signUp}
             </Button>
           </Link>
@@ -107,13 +107,13 @@ export function SiteHeader() {
           <div className="mt-3 flex flex-col gap-2">
             <Button
               variant="outline"
-              className="w-full rounded-lg border-border bg-transparent text-foreground hover:bg-secondary"
+              className="w-full rounded-xl border-white/10 bg-white/5 text-white hover:bg-white/10"
               onClick={() => window.location.href = "/login"}
             >
               {t.nav.login}
             </Button>
             <Button
-              className="w-full rounded-lg bg-brand-blue text-primary-foreground hover:bg-brand-blue/90"
+              className="w-full rounded-xl bg-gradient-to-r from-brand to-brand-blue text-primary-foreground shadow-lg shadow-brand/20"
               onClick={() => (window.location.href = "/register")}
             >
               {t.nav.signUp}

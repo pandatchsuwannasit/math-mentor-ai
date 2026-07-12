@@ -8,6 +8,7 @@ export interface QuizQuestion {
   choices: string[]
   answer: number
   explanation: string
+  solutionSteps: string[]
   hints: string[]
   /** Estimated time to answer in seconds */
   estimatedTime: number
@@ -24,7 +25,7 @@ export interface QuizQuestion {
 }
 
 export interface TopicQuestions {
-  [topicId: string]: QuizQuestion[]
+  [topicId: string]: Partial<QuizQuestion>[]
 }
 
 export interface TopicProgress {

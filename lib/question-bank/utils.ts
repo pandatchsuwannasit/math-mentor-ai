@@ -13,6 +13,7 @@ export function upgradeQuestion(q: Partial<QuizQuestion>): QuizQuestion {
     choices: q.choices || [],
     answer: q.answer ?? 0,
     explanation: q.explanation || "",
+    solutionSteps: q.solutionSteps || [],
     hints: q.hints || [],
     estimatedTime: q.estimatedTime || 60,
     learningObjective: q.learningObjective || "ฝึกทักษะการแก้โจทย์คณิตศาสตร์",

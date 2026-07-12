@@ -27,11 +27,18 @@ export const CURRICULUM_LABELS: Record<CurriculumLevel, string> = {
 
 export const CURRICULUM_BY_LEVEL: Record<CurriculumLevel, CurriculumTopic[]> = {
   M1: [
-    { id: "m1-integers", title: "จำนวนเต็ม", description: "การบวกลบคูณหารจำนวนเต็ม ลำดับขั้นตอน", subject: "Algebra" },
-    { id: "m1-exponents", title: "เลขยกกำลัง", description: "กฎเลขยกกำลัง การคำนวณและลดรูป", subject: "Algebra" },
-    { id: "m1-linear-equations", title: "สมการเชิงเส้น", description: "การแก้สมการเชิงเส้นตัวแปรเดียว", subject: "Algebra" },
-    { id: "m1-basic-geometry", title: "เรขาคณิตพื้นฐาน", description: "มุม เส้นตรง รูปทรงพื้นฐาน พื้นที่", subject: "Geometry" },
-    { id: "m1-data-basics", title: "สถิติเบื้องต้น", description: "ค่าเฉลี่ย มัธยฐาน ฐานนิยม กราฟ", subject: "Statistics" },
+    { id: "m1-integers", title: "Integers", description: "Add, subtract, multiply, and divide integers with confidence", subject: "Algebra" },
+    { id: "m1-fractions", title: "Fractions", description: "Add, simplify, and work with fractions", subject: "Algebra" },
+    { id: "m1-decimals", title: "Decimals", description: "Add, subtract, and multiply decimals accurately", subject: "Algebra" },
+    { id: "m1-linear-equations", title: "Linear Equations", description: "Solve one-step and two-step linear equations", subject: "Algebra" },
+    { id: "m1-ratio", title: "Ratio", description: "Simplify ratios and solve ratio word problems", subject: "Algebra" },
+    { id: "m1-percentage", title: "Percentage", description: "Find percentages and use them in real contexts", subject: "Algebra" },
+    { id: "m1-geometry", title: "Geometry", description: "Recognize angles, lines, and triangle facts", subject: "Geometry" },
+    { id: "m1-area", title: "Area", description: "Calculate the area of rectangles and triangles", subject: "Geometry" },
+    { id: "m1-volume", title: "Volume", description: "Find the volume of cubes and cuboids", subject: "Geometry" },
+    { id: "m1-graphs", title: "Graphs", description: "Read coordinates and understand the coordinate plane", subject: "Statistics" },
+    { id: "m1-statistics", title: "Statistics", description: "Find the mean, median, mode, and range", subject: "Statistics" },
+    { id: "m1-basic-probability", title: "Basic Probability", description: "Describe simple outcomes and probability", subject: "Statistics" },
   ],
   M2: [
     { id: "m2-polynomials", title: "พหุนาม", description: "การบวกลบพหุนาม การคูณพหุนาม", subject: "Algebra" },

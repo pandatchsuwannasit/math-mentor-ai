@@ -16,23 +16,52 @@ export function getQuestionAnswerIndex(question: QuizQuestion): number {
   return question.answer
 }
 
+export function validateQuestionAnswerMapping(question: QuizQuestion): { isValid: boolean; answerIndex: number; correctChoice: string | undefined } {
+  const answerIndex = getQuestionAnswerIndex(question)
+  const isValid = Number.isInteger(answerIndex) && answerIndex >= 0 && answerIndex < question.choices.length
+  const correctChoice = isValid ? question.choices[answerIndex] : undefined
+  return {
+    isValid: isValid && typeof correctChoice === "string",
+    answerIndex,
+    correctChoice,
+  }
+}
+
 export function isAnswerCorrect(question: QuizQuestion, selectedAnswerIndex: number): boolean {
-  return getQuestionAnswerIndex(question) === selectedAnswerIndex
+  const mapping = validateQuestionAnswerMapping(question)
+  if (!mapping.isValid) return false
+  return mapping.answerIndex === selectedAnswerIndex
 }
 
 export function shuffleQuestionChoices<T extends QuizQuestion>(question: T, random: () => number = Math.random): T {
-  const originalAnswer = question.choices[question.answer]
+  const mapping = validateQuestionAnswerMapping(question)
+  if (!mapping.isValid || mapping.correctChoice === undefined) {
+    throw new Error(`Invalid quiz answer mapping before shuffle: ${question.id}`)
+  }
+
   const shuffledChoices = [...question.choices]
   for (let i = shuffledChoices.length - 1; i > 0; i--) {
     const j = Math.floor(random() * (i + 1))
     ;[shuffledChoices[i], shuffledChoices[j]] = [shuffledChoices[j], shuffledChoices[i]]
   }
-  const newAnswerIndex = shuffledChoices.indexOf(originalAnswer)
-  return {
+
+  const newAnswerIndex = shuffledChoices.indexOf(mapping.correctChoice)
+  if (newAnswerIndex < 0) {
+    throw new Error(`Unable to remap correct answer for question: ${question.id}`)
+  }
+
+  const shuffledQuestion = {
     ...question,
     choices: shuffledChoices,
     answer: newAnswerIndex,
   }
+
+  const postShuffleMapping = validateQuestionAnswerMapping(shuffledQuestion)
+  if (!postShuffleMapping.isValid || postShuffleMapping.correctChoice !== mapping.correctChoice) {
+    throw new Error(`Answer mapping became invalid after shuffle: ${question.id}`)
+  }
+
+  return shuffledQuestion
 }
 
 export function calculateScore(questions: QuizQuestion[], answers: number[]): number {
@@ -44,7 +73,8 @@ export function getWrongQuestionIds(questions: QuizQuestion[], answers: number[]
 }
 
 export function runQuizFlow(question: QuizQuestion, selectedAnswerIndex: number, hearts: number): QuizAnswerResult {
-  const isCorrect = isAnswerCorrect(question, selectedAnswerIndex)
+  const mapping = validateQuestionAnswerMapping(question)
+  const isCorrect = mapping.isValid && mapping.answerIndex === selectedAnswerIndex
   const nextHearts = isCorrect ? hearts : hearts - 1
   const score = isCorrect ? 1 : 0
 
@@ -57,6 +87,6 @@ export function runQuizFlow(question: QuizQuestion, selectedAnswerIndex: number,
       incorrect: isCorrect ? 0 : 1,
     },
     selectedAnswerIndex,
-    correctAnswerIndex: getQuestionAnswerIndex(question),
+    correctAnswerIndex: mapping.answerIndex,
   }
 }

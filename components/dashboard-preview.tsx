@@ -63,14 +63,14 @@ export function DashboardPreview() {
   const areaPath = `${linePath} L${w},${h} L0,${h} Z`
 
   const sidebar = [
-    { icon: LayoutDashboard, label: d.sidebar.dashboard, active: true },
-    { icon: PencilRuler, label: d.sidebar.practice },
-    { icon: CalendarDays, label: d.sidebar.studyPlan },
-    { icon: BarChart3, label: d.sidebar.analysis },
-    { icon: FileText, label: d.sidebar.exams },
-    { icon: Lightbulb, label: d.sidebar.solutions },
-    { icon: TrendingUp, label: d.sidebar.progress },
-    { icon: Settings, label: d.sidebar.settings },
+    { id: "dashboard", icon: LayoutDashboard, label: d.sidebar.dashboard, active: true },
+    { id: "practice", icon: PencilRuler, label: d.sidebar.practice },
+    { id: "study-plan", icon: CalendarDays, label: d.sidebar.studyPlan },
+    { id: "analysis", icon: BarChart3, label: d.sidebar.analysis },
+    { id: "exams", icon: FileText, label: d.sidebar.exams },
+    { id: "solutions", icon: Lightbulb, label: d.sidebar.solutions },
+    { id: "progress", icon: TrendingUp, label: d.sidebar.progress },
+    { id: "settings", icon: Settings, label: d.sidebar.settings },
   ]
 
   const stats = [
@@ -103,7 +103,7 @@ export function DashboardPreview() {
           </div>
           {sidebar.map((item) => (
             <div
-              key={item.label}
+              key={item.id}
               className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium ${
                 item.active ? "bg-brand/15 text-brand" : "text-muted-foreground"
               }`}

@@ -35,13 +35,13 @@ const FEATURES = [
 
 export function Features() {
   return (
-    <section className="py-24">
+    <section className="relative py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
             ทุกสิ่งที่คุณต้องการเพื่อเก่งคณิต
           </h2>
-          <p className="mt-4 text-lg text-slate-400">
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-400">
             เครื่องมือครบครันที่ออกแบบมาเพื่อช่วยให้นักเรียนไทยพิชิตคณิตศาสตร์ระดับมัธยมปลายและการสอบเข้ามหาวิทยาลัย
           </p>
         </div>
@@ -50,9 +50,9 @@ export function Features() {
           {FEATURES.map((feature, index) => (
             <div
               key={index}
-              className="group relative rounded-2xl border border-slate-800 bg-slate-900/50 p-6 transition-all duration-300 hover:border-cyan-500/30 hover:bg-slate-900/80 card-hover"
+              className="group relative rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[0_16px_60px_rgba(2,8,23,0.24)] transition-all duration-300 hover:-translate-y-1 hover:border-brand/30 hover:bg-white/10"
             >
-              <div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400">
+              <div className="mb-4 flex size-12 items-center justify-center rounded-2xl bg-brand/10 text-brand">
                 <feature.icon className="size-6" />
               </div>
               <h3 className="text-lg font-semibold text-white">{feature.title}</h3>

@@ -21,28 +21,28 @@ export function Hero() {
   return (
     <section
       id="home"
-      className="relative overflow-hidden bg-navy-deep pb-24 pt-28 sm:pt-32 lg:pb-32"
+      className="relative overflow-hidden bg-transparent pb-24 pt-28 sm:pt-32 lg:pb-32"
     >
       <MathBackground />
 
       <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:gap-8 lg:px-8">
         {/* Left column */}
         <div className="fade-in-up">
-          <span className="inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-4 py-1.5 text-sm font-medium text-brand">
+          <span className="inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand/10 px-4 py-1.5 text-sm font-medium text-brand soft-ring">
             <Sparkles className="size-4" />
             {t.hero.badge}
           </span>
 
-          <h1 className="mt-6 text-pretty text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
+          <h1 className="mt-6 text-pretty text-5xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl">
             {t.hero.titlePre}
             <span className="text-brand">{t.hero.titleAccent}</span>
           </h1>
 
-          <p className="mt-4 text-balance text-xl font-medium text-foreground/90 sm:text-2xl">
+          <p className="mt-4 text-balance text-xl font-medium text-slate-200 sm:text-2xl">
             {t.hero.subtitle}
           </p>
 
-          <p className="mt-5 max-w-xl text-pretty leading-relaxed text-muted-foreground">
+          <p className="mt-5 max-w-xl text-pretty leading-relaxed text-slate-400">
             {t.hero.description}
           </p>
 
@@ -50,7 +50,7 @@ export function Hero() {
             <Link href="/login">
               <Button
                 size="lg"
-                className="h-12 rounded-xl bg-brand-blue px-6 text-base text-primary-foreground hover:bg-brand-blue/90"
+                className="h-12 rounded-2xl bg-gradient-to-r from-brand to-brand-blue px-6 text-base font-semibold text-primary-foreground shadow-lg shadow-brand/20 transition-all hover:translate-y-[-1px] hover:shadow-brand/30"
               >
                 {t.hero.startLearning}
                 <ArrowRight className="size-5" />
@@ -59,7 +59,7 @@ export function Hero() {
             <Button
               size="lg"
               variant="outline"
-              className="h-12 rounded-xl border-border bg-transparent px-6 text-base text-foreground hover:bg-secondary"
+              className="h-12 rounded-2xl border-white/10 bg-white/5 px-6 text-base text-white hover:bg-white/10"
             >
               {t.hero.viewStatistics}
               <BarChart3 className="size-5" />

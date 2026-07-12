@@ -14,10 +14,10 @@ import {
   XCircle,
   ChevronLeft,
   ChevronRight,
-  Heart,
   Sparkles,
-  Star,
   Trophy,
+  BookOpen,
+  ListChecks,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import { AuthGuard } from "@/components/auth-guard"
@@ -31,7 +31,7 @@ import { getQuestionsForTopic, getAdaptiveQuestions, saveTopicProgress, getTopic
 import type { QuizQuestion } from "@/lib/question-bank/types"
 import { QuizShell } from "./quiz-shell"
 import { CelebrationModal } from "@/components/celebration-modal"
-import { calculateScore, getWrongQuestionIds, getQuestionAnswerIndex, isAnswerCorrect, runQuizFlow } from "@/lib/quiz/answer-utils"
+import { calculateScore, getWrongQuestionIds, runQuizFlow, validateQuestionAnswerMapping } from "@/lib/quiz/answer-utils"
 
 const USERS_KEY = "mathmentor-users"
 const QUIZ_RESULTS_KEY = "mathmentor-quiz-results"
@@ -61,7 +61,7 @@ function QuizContent({ topicId }: { topicId?: string }) {
   const router = useRouter()
   const { user, refresh, setUser } = useAuth()
   const { t } = useLanguage()
-  const { awardQuizXP, loseHeart, hearts } = useGamification()
+  const { awardQuizXP } = useGamification()
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0)
   const [answers, setAnswers] = useState<number[]>([])
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
@@ -71,8 +71,8 @@ function QuizContent({ topicId }: { topicId?: string }) {
   const [hintStep, setHintStep] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [questions, setQuestions] = useState<QuizQuestion[]>([])
-  const [quizHearts, setQuizHearts] = useState(5)
-  const [quizEnded, setQuizEnded] = useState(false)
+  const [feedbackState, setFeedbackState] = useState<{ isCorrect: boolean; selectedAnswer: number | null } | null>(null)
+  const [answeredQuestions, setAnsweredQuestions] = useState<number[]>([])
   const [showCelebration, setShowCelebration] = useState(false)
   const [celebrationData, setCelebrationData] = useState({ xp: 0, levelUp: false, newLevel: 1, achievement: "" })
   const [animatingAnswer, setAnimatingAnswer] = useState<number | null>(null)
@@ -87,7 +87,6 @@ function QuizContent({ topicId }: { topicId?: string }) {
         const recentIds = progress?.recentQuestionIds || []
         const adaptiveQs = getAdaptiveQuestions(topicId, accuracy, Math.min(10, totalInTopic), recentIds)
         setQuestions(adaptiveQs)
-        setQuizHearts(user?.stats.hearts ?? 5)
       }
       setIsLoading(false)
     }, 300)
@@ -135,58 +134,54 @@ function QuizContent({ topicId }: { topicId?: string }) {
   const isLastQuestion = currentQuestionIdx === questions.length - 1
 
   function handleAnswer(answerIndex: number) {
+    if (feedbackState) return
+
     setAnimatingAnswer(answerIndex)
     setTimeout(() => setAnimatingAnswer(null), 200)
     setSelectedAnswer(answerIndex)
 
+    const answerResult = runQuizFlow(currentQuestion, answerIndex, 5)
+    setFeedbackState({ isCorrect: answerResult.isCorrect, selectedAnswer: answerIndex })
+
     if (process.env.NODE_ENV === "development") {
-      const answerResult = runQuizFlow(currentQuestion, answerIndex, quizHearts)
-      console.log("📝 [Quiz] Answer selected:", {
-        questionId: currentQuestion.id,
-        question: currentQuestion.question,
-        choices: currentQuestion.choices,
-        correctIndex: getQuestionAnswerIndex(currentQuestion),
-        correctChoice: currentQuestion.choices[getQuestionAnswerIndex(currentQuestion)],
-        userSelected: answerIndex,
-        userChoice: currentQuestion.choices[answerIndex],
-        isCorrect: answerResult.isCorrect,
-      })
+      const mapping = validateQuestionAnswerMapping(currentQuestion)
+      console.log("[Quiz] Question:", currentQuestion.question)
+      console.log("[Quiz] Choices:", currentQuestion.choices)
+      console.log("[Quiz] Answer Index:", mapping.answerIndex)
+      console.log("[Quiz] Correct Choice:", mapping.correctChoice)
+      console.log("[Quiz] Selected Index:", answerIndex)
+      console.log("[Quiz] Selected Choice:", currentQuestion.choices[answerIndex])
+      console.log("[Quiz] Validation:", answerResult.isCorrect ? "correct" : "incorrect")
     }
   }
 
   function handleNext() {
-    if (selectedAnswer === null) return
+    if (!feedbackState || feedbackState.selectedAnswer === null) return
 
-    const answerResult = runQuizFlow(currentQuestion, selectedAnswer, quizHearts)
+    const answerResult = runQuizFlow(currentQuestion, feedbackState.selectedAnswer, 5)
 
     if (process.env.NODE_ENV === "development") {
+      const mapping = validateQuestionAnswerMapping(currentQuestion)
+      console.log("[Quiz] Question:", currentQuestion.question)
+      console.log("[Quiz] Choices:", currentQuestion.choices)
+      console.log("[Quiz] Answer Index:", mapping.answerIndex)
+      console.log("[Quiz] Correct Choice:", mapping.correctChoice)
+      console.log("[Quiz] Selected Index:", feedbackState?.selectedAnswer)
+      console.log("[Quiz] Selected Choice:", feedbackState?.selectedAnswer !== null && feedbackState?.selectedAnswer !== undefined ? currentQuestion.choices[feedbackState.selectedAnswer] : "")
+      console.log("[Quiz] Validation:", answerResult.isCorrect ? "correct" : "incorrect")
       console.log("✅ [Quiz] Answer validation:", {
         questionId: currentQuestion.id,
-        userSelected: selectedAnswer,
-        userChoice: currentQuestion.choices[selectedAnswer],
-        correctIndex: getQuestionAnswerIndex(currentQuestion),
-        correctChoice: currentQuestion.choices[getQuestionAnswerIndex(currentQuestion)],
         isCorrect: answerResult.isCorrect,
-        heartsBefore: quizHearts,
-        heartsAfter: answerResult.heartsAfter,
       })
     }
 
-    if (!answerResult.isCorrect) {
-      const newHearts = answerResult.heartsAfter
-      setQuizHearts(newHearts)
-      loseHeart()
-      if (newHearts <= 0) {
-        setQuizEnded(true)
-        return
-      }
-    }
-
-    const newAnswers = [...answers, selectedAnswer]
+    const newAnswers = [...answers, feedbackState.selectedAnswer]
     setAnswers(newAnswers)
     setSelectedAnswer(null)
+    setFeedbackState(null)
+    setAnsweredQuestions((prev) => [...prev, currentQuestionIdx])
 
-    if (isLastQuestion || quizEnded) {
+    if (isLastQuestion) {
       const score = calculateScore(questions, newAnswers)
       const timeSpentMinutes = Math.round((Date.now() - startTime) / 60000)
       const percentage = Math.round((score / questions.length) * 100)
@@ -275,6 +270,8 @@ function QuizContent({ topicId }: { topicId?: string }) {
     setCurrentQuestionIdx(0)
     setAnswers([])
     setSelectedAnswer(null)
+    setFeedbackState(null)
+    setAnsweredQuestions([])
     setShowResult(false)
   }
 
@@ -308,6 +305,7 @@ function QuizContent({ topicId }: { topicId?: string }) {
   if (showResult) {
     const score = calculateScore(questions, answers)
     const percentage = Math.round((score / questions.length) * 100)
+    const topicSummary = getTopicSummary(questions, answers)
     const timeSpentMinutes = Math.round((Date.now() - startTime) / 60000)
     const isPerfect = score === questions.length
 
@@ -383,6 +381,33 @@ function QuizContent({ topicId }: { topicId?: string }) {
               </div>
               <p className="text-xs text-[#64748B]">{t.app.quiz.status}</p>
               <p className="text-xl font-bold text-emerald-400">{t.app.common.done}</p>
+            </div>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-2">
+            <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-5">
+              <p className="text-sm font-semibold text-red-300">Weak topics</p>
+              <div className="mt-3 space-y-2">
+                {topicSummary.weakTopics.length > 0 ? topicSummary.weakTopics.map((topic) => (
+                  <div key={topic} className="rounded-xl border border-red-500/20 bg-[#0B1121]/60 px-3 py-2 text-sm text-slate-300">
+                    {topic}
+                  </div>
+                )) : (
+                  <p className="text-sm text-slate-400">No weak topics this round — great work.</p>
+                )}
+              </div>
+            </div>
+            <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5">
+              <p className="text-sm font-semibold text-emerald-300">Strong topics</p>
+              <div className="mt-3 space-y-2">
+                {topicSummary.strongTopics.length > 0 ? topicSummary.strongTopics.map((topic) => (
+                  <div key={topic} className="rounded-xl border border-emerald-500/20 bg-[#0B1121]/60 px-3 py-2 text-sm text-slate-300">
+                    {topic}
+                  </div>
+                )) : (
+                  <p className="text-sm text-slate-400">Keep practicing to build more confidence.</p>
+                )}
+              </div>
             </div>
           </div>
 
@@ -477,7 +502,7 @@ function QuizContent({ topicId }: { topicId?: string }) {
 
   return (
     <div className="space-y-6">
-      {/* Header with progress and hearts */}
+      {/* Header with progress and learning focus */}
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-cyan-400">{currentQuestion.topicName || topicId}</p>
@@ -486,9 +511,9 @@ function QuizContent({ topicId }: { topicId?: string }) {
           </h1>
         </div>
         <div className="flex items-center gap-3">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-red-500/10 px-3 py-1.5 text-sm font-medium text-red-400 ring-1 ring-red-500/20">
-            <Heart className="size-4" />
-            <span>{quizHearts}</span>
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1.5 text-sm font-medium text-emerald-400 ring-1 ring-emerald-500/20">
+            <BookOpen className="size-4" />
+            <span>{currentQuestion.topicName}</span>
           </div>
           <div className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium ring-1 ${
             currentQuestion.difficulty === "easy"
@@ -515,29 +540,6 @@ function QuizContent({ topicId }: { topicId?: string }) {
           />
         </div>
       </div>
-
-      {/* Hearts depletion warning */}
-      {quizEnded && (
-        <div className="rounded-2xl border border-red-500/20 bg-gradient-to-br from-red-500/10 to-red-500/5 p-6 text-center fade-in">
-          <Heart className="mx-auto size-10 text-red-400" />
-          <p className="mt-3 text-lg font-semibold text-red-300">{t.app.common.noHearts}</p>
-          <p className="mt-1 text-sm text-red-400">{t.app.common.tryAgain}</p>
-          <button
-            type="button"
-            onClick={() => {
-              setQuizHearts(5)
-              setQuizEnded(false)
-              setCurrentQuestionIdx(0)
-              setAnswers([])
-              setSelectedAnswer(null)
-            }}
-            className="btn-primary mt-4 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-red-500 to-red-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-500/20 transition-all duration-200 hover:shadow-xl hover:shadow-red-500/30"
-          >
-            <RotateCcw className="size-4" />
-            {t.app.common.tryAgain}
-          </button>
-        </div>
-      )}
 
       {/* Hint panel */}
       {showHints && currentQuestion.hints && currentQuestion.hints.length > 0 && (
@@ -605,32 +607,90 @@ function QuizContent({ topicId }: { topicId?: string }) {
 
         {/* Answer Options */}
         <div className="space-y-3">
-          {currentQuestion.choices.map((option: string, index: number) => (
-            <button
-              key={option}
-              type="button"
-              onClick={() => handleAnswer(index)}
-              className={`group w-full rounded-2xl border p-4 text-left transition-all duration-200 ${
-                selectedAnswer === index
-                  ? "border-cyan-500/50 bg-gradient-to-r from-cyan-500/15 to-blue-500/10 text-[#F8FAFC] shadow-lg shadow-cyan-500/10"
-                  : "border-[#1E293B] bg-[#0B1121]/60 text-[#CBD5E1] hover:border-[#334155] hover:bg-[#0F172A]/80 hover:shadow-md"
-              } ${animatingAnswer === index ? 'scale-[1.02]' : 'scale-100'}`}
-            >
-              <div className="flex items-center gap-4">
-                <div
-                  className={`flex size-8 shrink-0 items-center justify-center rounded-xl text-sm font-bold transition-all ${
-                    selectedAnswer === index
-                      ? "bg-gradient-to-br from-cyan-500 to-blue-500 text-white shadow-md"
-                      : "bg-[#1E293B] text-[#64748B] group-hover:bg-[#334155] group-hover:text-[#CBD5E1]"
-                  }`}
-                >
-                  {String.fromCharCode(65 + index)}
+          {currentQuestion.choices.map((option: string, index: number) => {
+            const isSelected = feedbackState?.selectedAnswer === index
+            const isCorrectOption = index === currentQuestion.answer
+            const showResult = Boolean(feedbackState)
+            const buttonTone = showResult
+              ? isCorrectOption
+                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-200"
+                : isSelected
+                  ? "border-red-500/40 bg-red-500/10 text-red-200"
+                  : "border-[#1E293B] bg-[#0B1121]/60 text-[#CBD5E1]"
+              : selectedAnswer === index
+                ? "border-cyan-500/50 bg-gradient-to-r from-cyan-500/15 to-blue-500/10 text-[#F8FAFC] shadow-lg shadow-cyan-500/10"
+                : "border-[#1E293B] bg-[#0B1121]/60 text-[#CBD5E1] hover:border-[#334155] hover:bg-[#0F172A]/80 hover:shadow-md"
+
+            return (
+              <button
+                key={`${currentQuestion.id}-${option}`}
+                type="button"
+                onClick={() => handleAnswer(index)}
+                disabled={Boolean(feedbackState)}
+                className={`group w-full rounded-2xl border p-4 text-left transition-all duration-200 ${buttonTone} ${animatingAnswer === index ? "scale-[1.02]" : "scale-100"}`}
+              >
+                <div className="flex items-center gap-4">
+                  <div
+                    className={`flex size-8 shrink-0 items-center justify-center rounded-xl text-sm font-bold transition-all ${
+                      showResult && isCorrectOption
+                        ? "bg-emerald-500/20 text-emerald-400"
+                        : showResult && isSelected && !isCorrectOption
+                          ? "bg-red-500/20 text-red-400"
+                          : selectedAnswer === index
+                            ? "bg-gradient-to-br from-cyan-500 to-blue-500 text-white shadow-md"
+                            : "bg-[#1E293B] text-[#64748B] group-hover:bg-[#334155] group-hover:text-[#CBD5E1]"
+                    }`}
+                  >
+                    {String.fromCharCode(65 + index)}
+                  </div>
+                  <span className="text-sm font-medium">{option}</span>
                 </div>
-                <span className="text-sm font-medium">{option}</span>
-              </div>
-            </button>
-          ))}
+              </button>
+            )
+          })}
         </div>
+
+        {feedbackState && (
+          <div className={`mt-6 rounded-2xl border p-5 ${feedbackState.isCorrect ? "border-emerald-500/30 bg-emerald-500/10" : "border-red-500/30 bg-red-500/10"}`}>
+            <div className="flex items-start gap-3">
+              {feedbackState.isCorrect ? (
+                <CheckCircle2 className="mt-0.5 size-6 text-emerald-400" />
+              ) : (
+                <XCircle className="mt-0.5 size-6 text-red-400" />
+              )}
+              <div className="flex-1 space-y-4">
+                <div>
+                  <p className={`text-lg font-semibold ${feedbackState.isCorrect ? "text-emerald-300" : "text-red-300"}`}>
+                    {feedbackState.isCorrect ? "✓ Correct" : "✗ Incorrect"}
+                  </p>
+                  <p className="mt-1 text-sm text-slate-300">
+                    {feedbackState.isCorrect ? `+1 score` : `Correct answer: ${currentQuestion.choices[currentQuestion.answer]}`}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-slate-950/40 p-4">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-cyan-300">
+                    <Lightbulb className="size-4" />
+                    Explanation
+                  </div>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-300">{currentQuestion.explanation}</p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-slate-950/40 p-4">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-cyan-300">
+                    <ListChecks className="size-4" />
+                    Step-by-step solution
+                  </div>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-300">
+                    {currentQuestion.solutionSteps?.map((step) => <li key={step}>{step}</li>)}
+                  </ul>
+                </div>
+                <div className="flex flex-wrap gap-2 text-xs text-slate-400">
+                  <span className="rounded-full border border-white/10 px-3 py-1">Topic: {currentQuestion.topicName}</span>
+                  <span className="rounded-full border border-white/10 px-3 py-1">Difficulty: {currentQuestion.difficulty}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Navigation */}
         <div className="mt-8 flex items-center justify-between gap-3">
@@ -640,6 +700,7 @@ function QuizContent({ topicId }: { topicId?: string }) {
               if (currentQuestionIdx > 0) {
                 setCurrentQuestionIdx(currentQuestionIdx - 1)
                 setSelectedAnswer(null)
+                setFeedbackState(null)
               }
             }}
             disabled={currentQuestionIdx === 0}
@@ -651,7 +712,7 @@ function QuizContent({ topicId }: { topicId?: string }) {
           <button
             type="button"
             onClick={handleNext}
-            disabled={selectedAnswer === null}
+            disabled={!feedbackState}
             className="btn-primary flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all duration-200 hover:shadow-xl hover:shadow-cyan-500/30 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isLastQuestion ? (
@@ -661,7 +722,7 @@ function QuizContent({ topicId }: { topicId?: string }) {
               </>
             ) : (
               <>
-                {t.app.quiz.next}
+                Next Question
                 <ChevronRight className="size-4" />
               </>
             )}
@@ -674,6 +735,28 @@ function QuizContent({ topicId }: { topicId?: string }) {
 
 function getTotalForTopic(topicId: string): number {
   return getQuestionsForTopic(topicId).length
+}
+
+function getTopicSummary(questions: QuizQuestion[], answers: number[]) {
+  const grouped = new Map<string, { correct: number; total: number }>()
+
+  questions.forEach((question, index) => {
+    const topic = question.topicName || question.topicId
+    const bucket = grouped.get(topic) ?? { correct: 0, total: 0 }
+    bucket.total += 1
+    if (answers[index] === question.answer) bucket.correct += 1
+    grouped.set(topic, bucket)
+  })
+
+  const entries = Array.from(grouped.entries()).map(([topic, values]) => ({
+    topic,
+    accuracy: values.total === 0 ? 0 : Math.round((values.correct / values.total) * 100),
+  }))
+
+  return {
+    weakTopics: entries.filter((entry) => entry.accuracy < 60).sort((a, b) => a.accuracy - b.accuracy).map((entry) => entry.topic),
+    strongTopics: entries.filter((entry) => entry.accuracy >= 80).sort((a, b) => b.accuracy - a.accuracy).map((entry) => entry.topic),
+  }
 }
 
 function saveQuizProgress({

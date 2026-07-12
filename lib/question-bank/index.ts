@@ -4,19 +4,24 @@ export { M3_QUESTIONS } from "./m3"
 export { M4_QUESTIONS } from "./m4"
 export { M5_QUESTIONS } from "./m5"
 export { M6_QUESTIONS } from "./m6"
+export { GRADE7_M1_QUESTIONS } from "./m1-grade7"
 
 import type { QuizQuestion, TopicProgress } from "./types"
 import { M1_QUESTIONS } from "./m1"
+import { GRADE7_M1_QUESTIONS } from "./m1-grade7"
 import { M2_QUESTIONS } from "./m2"
 import { M3_QUESTIONS } from "./m3"
 import { M4_QUESTIONS } from "./m4"
 import { M5_QUESTIONS } from "./m5"
 import { M6_QUESTIONS } from "./m6"
 import { upgradeQuestion, getDifficultyDistribution } from "./utils"
-import { shuffleQuestionChoices } from "@/lib/quiz/answer-utils"
+import { shuffleQuestionChoices, validateQuestionAnswerMapping } from "@/lib/quiz/answer-utils"
 
 export const QUESTION_BANK: Record<string, Record<string, QuizQuestion[]>> = {
-  M1: M1_QUESTIONS as any,
+  M1: {
+    ...M1_QUESTIONS,
+    ...GRADE7_M1_QUESTIONS,
+  } as any,
   M2: M2_QUESTIONS as any,
   M3: M3_QUESTIONS as any,
   M4: M4_QUESTIONS as any,
@@ -82,6 +87,7 @@ export function getAdaptiveQuestions(
   // Shuffle final selection and answer choices
   return selected.sort(() => Math.random() - 0.5).map((q) => {
     const shuffledQuestion = shuffleQuestionChoices(q)
+    const validation = validateQuestionAnswerMapping(shuffledQuestion)
 
     if (process.env.NODE_ENV === "development") {
       console.log("🔀 [QuestionBank] Shuffled choices:", {
@@ -90,6 +96,7 @@ export function getAdaptiveQuestions(
         originalAnswer: q.choices[q.answer],
         newAnswerIndex: shuffledQuestion.answer,
         choices: shuffledQuestion.choices,
+        valid: validation.isValid,
       })
     }
 
@@ -182,11 +189,3 @@ export function saveTopicProgress(topicId: string, progress: TopicProgress): voi
   }
 }
 
-function shuffleArray<T>(array: T[]): T[] {
-  const shuffled = [...array]
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-  }
-  return shuffled
-}
