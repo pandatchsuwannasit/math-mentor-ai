@@ -120,7 +120,7 @@ Provide a structured summary with:
 export function buildQuizPrompt(
   question: string,
   choices: string[],
-  correctAnswer: number,
+  answer: number,
   studentAnswer: number,
 ): string {
   return `Please explain this quiz question:
@@ -130,10 +130,10 @@ Question: ${question}
 Choices:
 ${choices.map((c, i) => `${i + 1}. ${c}`).join("\n")}
 
-Correct Answer: ${choices[correctAnswer]}
+Correct Answer: ${choices[answer]}
 ${studentAnswer !== undefined ? `Student's Answer: ${choices[studentAnswer]}` : ""}
 
-${studentAnswer !== undefined && studentAnswer === correctAnswer ? "The student answered correctly. Explain why this is the correct answer." : "The student answered incorrectly. Explain why the correct answer is right and help them understand their mistake."}
+${studentAnswer !== undefined && studentAnswer === answer ? "The student answered correctly. Explain why this is the correct answer." : "The student answered incorrectly. Explain why the correct answer is right and help them understand their mistake."}
 
 Always end with ## Summary or ## Final Answer`
 }

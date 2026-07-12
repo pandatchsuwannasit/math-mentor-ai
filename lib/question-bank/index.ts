@@ -13,6 +13,7 @@ import { M4_QUESTIONS } from "./m4"
 import { M5_QUESTIONS } from "./m5"
 import { M6_QUESTIONS } from "./m6"
 import { upgradeQuestion, getDifficultyDistribution } from "./utils"
+import { shuffleQuestionChoices } from "@/lib/quiz/answer-utils"
 
 export const QUESTION_BANK: Record<string, Record<string, QuizQuestion[]>> = {
   M1: M1_QUESTIONS as any,
@@ -80,26 +81,19 @@ export function getAdaptiveQuestions(
 
   // Shuffle final selection and answer choices
   return selected.sort(() => Math.random() - 0.5).map((q) => {
-    const originalAnswer = q.choices[q.answer]
-    const shuffledChoices = shuffleArray([...q.choices])
-    const newAnswerIndex = shuffledChoices.indexOf(originalAnswer)
-    
-    // Development log
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔀 [QuestionBank] Shuffled choices:', {
+    const shuffledQuestion = shuffleQuestionChoices(q)
+
+    if (process.env.NODE_ENV === "development") {
+      console.log("🔀 [QuestionBank] Shuffled choices:", {
         questionId: q.id,
         originalAnswerIndex: q.answer,
-        originalAnswer: originalAnswer,
-        newAnswerIndex: newAnswerIndex,
-        choices: shuffledChoices,
+        originalAnswer: q.choices[q.answer],
+        newAnswerIndex: shuffledQuestion.answer,
+        choices: shuffledQuestion.choices,
       })
     }
-    
-    return {
-      ...q,
-      choices: shuffledChoices,
-      answer: newAnswerIndex,
-    }
+
+    return shuffledQuestion
   })
 }
 

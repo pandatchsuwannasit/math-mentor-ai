@@ -9,7 +9,7 @@ export default function QuestionEditorPage() {
   const [question, setQuestion] = useState({
     text: "",
     choices: ["", "", "", ""],
-    correctAnswer: 0,
+    answer: 0,
     explanation: "",
     hints: [""],
     difficulty: "medium",
@@ -147,9 +147,9 @@ export default function QuestionEditorPage() {
                 <div key={index} className="flex items-center gap-3">
                   <input
                     type="radio"
-                    name="correctAnswer"
-                    checked={question.correctAnswer === index}
-                    onChange={() => setQuestion({ ...question, correctAnswer: index })}
+                    name="answer"
+                    checked={question.answer === index}
+                    onChange={() => setQuestion({ ...question, answer: index })}
                     className="size-4 text-cyan-500"
                   />
                   <input
@@ -265,7 +265,7 @@ export default function QuestionEditorPage() {
                 <div
                   key={index}
                   className={`rounded-lg border p-3 ${
-                    question.correctAnswer === index
+                    question.answer === index
                       ? "border-cyan-500 bg-cyan-500/10"
                       : "border-slate-800 bg-slate-950/50"
                   }`}

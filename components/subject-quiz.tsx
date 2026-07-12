@@ -31,6 +31,7 @@ import { getQuestionsForTopic, getAdaptiveQuestions, saveTopicProgress, getTopic
 import type { QuizQuestion } from "@/lib/question-bank/types"
 import { QuizShell } from "./quiz-shell"
 import { CelebrationModal } from "@/components/celebration-modal"
+import { calculateScore, getWrongQuestionIds, getQuestionAnswerIndex, isAnswerCorrect, runQuizFlow } from "@/lib/quiz/answer-utils"
 
 const USERS_KEY = "mathmentor-users"
 const QUIZ_RESULTS_KEY = "mathmentor-quiz-results"
@@ -137,19 +138,18 @@ function QuizContent({ topicId }: { topicId?: string }) {
     setAnimatingAnswer(answerIndex)
     setTimeout(() => setAnimatingAnswer(null), 200)
     setSelectedAnswer(answerIndex)
-    
-    // Development log
-    if (process.env.NODE_ENV === 'development') {
-      const isCorrect = answerIndex === currentQuestion.answer
-      console.log('📝 [Quiz] Answer selected:', {
+
+    if (process.env.NODE_ENV === "development") {
+      const answerResult = runQuizFlow(currentQuestion, answerIndex, quizHearts)
+      console.log("📝 [Quiz] Answer selected:", {
         questionId: currentQuestion.id,
         question: currentQuestion.question,
         choices: currentQuestion.choices,
-        correctIndex: currentQuestion.answer,
-        correctChoice: currentQuestion.choices[currentQuestion.answer],
+        correctIndex: getQuestionAnswerIndex(currentQuestion),
+        correctChoice: currentQuestion.choices[getQuestionAnswerIndex(currentQuestion)],
         userSelected: answerIndex,
         userChoice: currentQuestion.choices[answerIndex],
-        isCorrect: isCorrect,
+        isCorrect: answerResult.isCorrect,
       })
     }
   }
@@ -157,24 +157,23 @@ function QuizContent({ topicId }: { topicId?: string }) {
   function handleNext() {
     if (selectedAnswer === null) return
 
-    const isCorrect = selectedAnswer === currentQuestion.answer
-    
-    // Development log for validation
-    if (process.env.NODE_ENV === 'development') {
-      console.log('✅ [Quiz] Answer validation:', {
+    const answerResult = runQuizFlow(currentQuestion, selectedAnswer, quizHearts)
+
+    if (process.env.NODE_ENV === "development") {
+      console.log("✅ [Quiz] Answer validation:", {
         questionId: currentQuestion.id,
         userSelected: selectedAnswer,
         userChoice: currentQuestion.choices[selectedAnswer],
-        correctIndex: currentQuestion.answer,
-        correctChoice: currentQuestion.choices[currentQuestion.answer],
-        isCorrect: isCorrect,
+        correctIndex: getQuestionAnswerIndex(currentQuestion),
+        correctChoice: currentQuestion.choices[getQuestionAnswerIndex(currentQuestion)],
+        isCorrect: answerResult.isCorrect,
         heartsBefore: quizHearts,
-        heartsAfter: isCorrect ? quizHearts : quizHearts - 1,
+        heartsAfter: answerResult.heartsAfter,
       })
     }
-    
-    if (!isCorrect) {
-      const newHearts = quizHearts - 1
+
+    if (!answerResult.isCorrect) {
+      const newHearts = answerResult.heartsAfter
       setQuizHearts(newHearts)
       loseHeart()
       if (newHearts <= 0) {
@@ -188,7 +187,7 @@ function QuizContent({ topicId }: { topicId?: string }) {
     setSelectedAnswer(null)
 
     if (isLastQuestion || quizEnded) {
-      const score = getScore(newAnswers, questions)
+      const score = calculateScore(questions, newAnswers)
       const timeSpentMinutes = Math.round((Date.now() - startTime) / 60000)
       const percentage = Math.round((score / questions.length) * 100)
 
@@ -203,8 +202,8 @@ function QuizContent({ topicId }: { topicId?: string }) {
         timeSpentMinutes,
       }
 
-      const wrongIds = getWrongIds(newAnswers)
-      const scoreVal = getScore(newAnswers, questions)
+      const wrongIds = getWrongQuestionIds(questions, newAnswers)
+      const scoreVal = calculateScore(questions, newAnswers)
       
       const updatedUser = saveQuizProgress({
         userId: activeUser.id,
@@ -272,10 +271,6 @@ function QuizContent({ topicId }: { topicId?: string }) {
     setCurrentQuestionIdx(currentQuestionIdx + 1)
   }
 
-  function getWrongIds(answers: number[]): string[] {
-    return questions.filter((q, i) => answers[i] !== q.answer).map((q) => q.id)
-  }
-
   function handleRestart() {
     setCurrentQuestionIdx(0)
     setAnswers([])
@@ -311,7 +306,7 @@ function QuizContent({ topicId }: { topicId?: string }) {
   }
 
   if (showResult) {
-    const score = getScore(answers, questions)
+    const score = calculateScore(questions, answers)
     const percentage = Math.round((score / questions.length) * 100)
     const timeSpentMinutes = Math.round((Date.now() - startTime) / 60000)
     const isPerfect = score === questions.length
@@ -675,12 +670,6 @@ function QuizContent({ topicId }: { topicId?: string }) {
       </section>
     </div>
   )
-}
-
-function getScore(answers: number[], questions: QuizQuestion[]) {
-  return answers.reduce((acc, answer, index) => {
-    return acc + (answer === questions[index].answer ? 1 : 0)
-  }, 0)
 }
 
 function getTotalForTopic(topicId: string): number {

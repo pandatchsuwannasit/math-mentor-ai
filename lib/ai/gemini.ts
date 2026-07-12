@@ -26,7 +26,7 @@ function buildPrompt(mode: AIMode, prompt: string, context?: string): string {
     case "quiz": {
       const parsed = tryParseQuizContext(context)
       if (parsed) {
-        return buildQuizPrompt(parsed.question, parsed.choices, parsed.correctAnswer, parsed.studentAnswer)
+        return buildQuizPrompt(parsed.question, parsed.choices, parsed.answer, parsed.studentAnswer)
       }
       return prompt
     }
@@ -45,12 +45,19 @@ function buildPrompt(mode: AIMode, prompt: string, context?: string): string {
 function tryParseQuizContext(context?: string): {
   question: string
   choices: string[]
-  correctAnswer: number
+  answer: number
   studentAnswer: number
 } | null {
   if (!context) return null
   try {
-    return JSON.parse(context)
+    const parsed = JSON.parse(context) as Partial<{ question: string; choices: string[]; answer: number; correctAnswer: number; studentAnswer: number }>
+    if (!parsed.question || !parsed.choices) return null
+    return {
+      question: parsed.question,
+      choices: parsed.choices,
+      answer: parsed.answer ?? parsed.correctAnswer ?? 0,
+      studentAnswer: parsed.studentAnswer ?? 0,
+    }
   } catch {
     return null
   }
