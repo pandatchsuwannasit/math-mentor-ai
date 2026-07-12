@@ -137,12 +137,42 @@ function QuizContent({ topicId }: { topicId?: string }) {
     setAnimatingAnswer(answerIndex)
     setTimeout(() => setAnimatingAnswer(null), 200)
     setSelectedAnswer(answerIndex)
+    
+    // Development log
+    if (process.env.NODE_ENV === 'development') {
+      const isCorrect = answerIndex === currentQuestion.answer
+      console.log('📝 [Quiz] Answer selected:', {
+        questionId: currentQuestion.id,
+        question: currentQuestion.question,
+        choices: currentQuestion.choices,
+        correctIndex: currentQuestion.answer,
+        correctChoice: currentQuestion.choices[currentQuestion.answer],
+        userSelected: answerIndex,
+        userChoice: currentQuestion.choices[answerIndex],
+        isCorrect: isCorrect,
+      })
+    }
   }
 
   function handleNext() {
     if (selectedAnswer === null) return
 
     const isCorrect = selectedAnswer === currentQuestion.answer
+    
+    // Development log for validation
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ [Quiz] Answer validation:', {
+        questionId: currentQuestion.id,
+        userSelected: selectedAnswer,
+        userChoice: currentQuestion.choices[selectedAnswer],
+        correctIndex: currentQuestion.answer,
+        correctChoice: currentQuestion.choices[currentQuestion.answer],
+        isCorrect: isCorrect,
+        heartsBefore: quizHearts,
+        heartsAfter: isCorrect ? quizHearts : quizHearts - 1,
+      })
+    }
+    
     if (!isCorrect) {
       const newHearts = quizHearts - 1
       setQuizHearts(newHearts)

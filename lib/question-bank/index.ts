@@ -79,10 +79,28 @@ export function getAdaptiveQuestions(
   }
 
   // Shuffle final selection and answer choices
-  return selected.sort(() => Math.random() - 0.5).map((q) => ({
-    ...q,
-    choices: shuffleArray([...q.choices]),
-  }))
+  return selected.sort(() => Math.random() - 0.5).map((q) => {
+    const originalAnswer = q.choices[q.answer]
+    const shuffledChoices = shuffleArray([...q.choices])
+    const newAnswerIndex = shuffledChoices.indexOf(originalAnswer)
+    
+    // Development log
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔀 [QuestionBank] Shuffled choices:', {
+        questionId: q.id,
+        originalAnswerIndex: q.answer,
+        originalAnswer: originalAnswer,
+        newAnswerIndex: newAnswerIndex,
+        choices: shuffledChoices,
+      })
+    }
+    
+    return {
+      ...q,
+      choices: shuffledChoices,
+      answer: newAnswerIndex,
+    }
+  })
 }
 
 /** Random questions (legacy) */
